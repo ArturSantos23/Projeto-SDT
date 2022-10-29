@@ -1,4 +1,4 @@
-# Projeto-SDT
+# Sprint 1 (Concluido :white_check_mark:)
 
 ## Descrição Sprint 1
 
