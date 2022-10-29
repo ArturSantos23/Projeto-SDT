@@ -9,6 +9,8 @@ Além disso, queremos guardar todos os pedidos dos clientes numa zona de armazen
 e identificador único.
 Os clientes podem então verificar o estado dos seus pedidos em qualquer momento.
 
+### Nota: Cada sprint tem uma branch dedicada
+
 ## Membros do grupo
 
 Artur Manuel Correia dos Santos - 20251 - pv20251@alunos.estgv.ipv.pt
