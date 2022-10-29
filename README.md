@@ -3,11 +3,11 @@
 ## Descrição
 
 Com este projeto, queremos criar um sistema que possa distribuir pedidos de clientes.
-Com isto em mente, queremos distribuir todo o "trabalho" para vários processadores, para evitar
+Com isto em mente, queremos distribuir todo o "trabalho" para vários processadores, de modo a evitar
 o desequilíbrio de carga entre as várias máquinas.
-Depois disso, queremos armazenar todos os pedidos dos clientes numa zona de armazenamento, cada uma com uma
-e identificador único. 
-Os clientes podem verificar o estado do seu pedido em qualquer momento.
+Além disso, queremos guardar todos os pedidos dos clientes numa zona de armazenamento, cada uma com uma
+e identificador único.
+Os clientes podem então verificar o estado dos seus pedidos em qualquer momento.
 
 ## Membros do grupo
 
