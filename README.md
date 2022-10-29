@@ -17,7 +17,7 @@ Artur Manuel Correia dos Santos - 20251 - pv20251@alunos.estgv.ipv.pt
 
 Luís Pedro Assunção Bidarra Pais - 20253 - pv20253@alunos.estgv.ipv.pt
 
-Daniel Vale - 20246 - pv20246@alunos.estgv.ipv.pt
+Daniel Valente Vale - 20246 - pv20246@alunos.estgv.ipv.pt
 
 ## Linguagens utilizadas:
 
