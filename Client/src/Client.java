@@ -15,16 +15,16 @@ public class Client {
         }
     }
     public static void main(String[] args) {
-        FileListInterface l = null;
+        FileListInterface l;
         File f = new File("C:\\Users\\artur\\Desktop\\Artur\\Teste.png");
         String base64 = FileToBase64(f);
         String UUID;
         try{
-            l  = (FileListInterface) Naming.lookup("rmi://localhost:2022/filelist");
+            l = (FileListInterface) Naming.lookup("rmi://localhost:2022/filelist");
             FileData fd = new FileData(null, "Teste.png", base64);
             l.addFile(fd);
             UUID = l.getFileID("Teste.png");
-            System.out.print("File UUID: ");
+            System.out.print("Identificador do ficheiro: ");
             System.out.println(UUID);
 
         } catch(RemoteException e) {
