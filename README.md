@@ -1,4 +1,4 @@
-# Sprint 1 (Concluido :white_check_mark:)
+# Sprint 1 (Concluído :white_check_mark:)
 
 ## Descrição Sprint 1
 
