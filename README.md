@@ -1,6 +1,6 @@
-# Sprint 1 (Concluído :white_check_mark:)
+# Sprint 2 [//]: <(Concluído :white_check_mark:)>
 
-## Descrição Sprint 1
+## Descrição Sprint 2
 
 O cliente submete um pedido de armazenamento de dados no processo líder da camada de storage, e recebe um identificador para os dados (UUID).
 
