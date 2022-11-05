@@ -2,7 +2,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class Server {
+public class Server1 {
     public static Registry r = null;
 
     public static FileManager fileList;
