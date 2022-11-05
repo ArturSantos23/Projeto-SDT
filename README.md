@@ -1,4 +1,4 @@
-# Sprint 2 [(Concluído :white_check_mark:)]
+# Sprint 2 <!---(Concluído :white_check_mark:)-->
 
 ## Descrição Sprint 2
 
