@@ -23,14 +23,10 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
         Path destinationFile = Paths.get("./savedFiles", f.getFileName());
         Files.write(destinationFile, decodedImg);
     }
-    public void addFile(FileData f) throws RemoteException {
-        String fileName = f.getFileName();
-        String resultUUID = UUID.nameUUIDFromBytes(fileName.getBytes()).toString();
-
+    public UUID addFile(FileData f) throws RemoteException {
+        UUID id = UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(f.getFileBase64()).getBytes()).toString());
         //System.out.println(f.getFileName());  //For testing
-        //System.out.println(resultUUID);   //For testing
-
-        UUID id = UUID.fromString(resultUUID);;
+        //System.out.println(id);   //For testing
         f.setFileID(id);
         this.fileList.add(f);
         try {
@@ -38,6 +34,7 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
         }catch (Exception e) {
             System.out.println("base64ToFile: " + e.getMessage());
         }
+        return id;
     }
     public String getFileID(String fileName) throws RemoteException{
         for(int i = 0; i < this.fileList.size(); ++i) {

@@ -3,12 +3,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.Base64;
 
 public class Client {
     public static String FileToBase64(File file){
         try {
             byte[] fileContent = Files.readAllBytes(file.toPath());
+            //System.out.println("bytes: " + Arrays.toString(fileContent));
             return Base64.getEncoder().encodeToString(fileContent);
         } catch (IOException e) {
             throw new IllegalStateException("could not read file " + file, e);

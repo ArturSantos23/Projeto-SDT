@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface FileListInterface extends Remote{
 
-    public void addFile(FileData f) throws RemoteException;
+    public UUID addFile(FileData f) throws RemoteException;
 
     public String getFileID(String fileName) throws RemoteException;
 
