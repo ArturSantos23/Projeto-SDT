@@ -8,8 +8,8 @@ public class Server2 {
     public static FileManager fileList;
 
     public static void main(String[] args) {
-
         try {
+            System.setProperty("java.rmi.server.hostname","127.0.0.2");
             r = LocateRegistry.createRegistry(2022);
         } catch (RemoteException a) {
             a.printStackTrace();
