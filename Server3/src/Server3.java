@@ -10,7 +10,7 @@ public class Server3 {
     public static void main(String[] args) {
 
         try {
-            r = LocateRegistry.createRegistry(2022);
+            r = LocateRegistry.createRegistry(2023);
         } catch (RemoteException a) {
             a.printStackTrace();
         }
