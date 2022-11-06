@@ -22,16 +22,17 @@ public class Client {
     private static void doGetServer(LoadBalancer loadBalance, int queryTimes) {
         for (int i = 1; i <= queryTimes; i++) {
             FileListInterface l;
-            File f = new File("C:\\Users\\artur\\Desktop\\Artur\\TesteV2.jpg");
+            File f = new File("C:\\Users\\artur\\Desktop\\Artur\\Teste.png");
             String base64 = FileToBase64(f);
             UUID UUID = null;
+            String[] serverName = null;
 
-            String serverId = loadBalance.getServer(String.valueOf(i));
-            String[] serverIdSplited = serverId.split("//",2);
-            String[] serverName = serverIdSplited[1].split("/",2);
             try{
+                String serverId = loadBalance.getServer(String.valueOf(i));
+                String[] serverIdSplited = serverId.split("//",2);
+                serverName = serverIdSplited[1].split("/",2);
                 l = (FileListInterface) Naming.lookup(serverId);
-                FileData fd = new FileData(null, "TesteV2.jpg", base64);
+                FileData fd = new FileData(null, "Teste.png", base64);
                 UUID = l.addFile(fd);
 
             } catch (ConnectException e) {
@@ -52,7 +53,7 @@ public class Client {
     }
 
     public static void GetServer(LoadBalancer loadBalance) {
-        doGetServer(loadBalance, 12);
+        doGetServer(loadBalance, 10);
     }
 
     public static void loadBalance() {
