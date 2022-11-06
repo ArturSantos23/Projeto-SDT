@@ -18,7 +18,6 @@ public class WeightRoundRobin implements LoadBalancer {
                     serverList.add(serverItem);
                 }
             }
-
         }
 
         synchronized (position) {

@@ -6,9 +6,9 @@ public class FileData implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID fileID;
 
-    private String fileName;
+    private final String fileName;
 
-    private String fileBase64;
+    private final String fileBase64;
 
     public FileData(UUID fileID, String fileName, String fileBase64){
         this.fileID = fileID;
@@ -28,15 +28,7 @@ public class FileData implements Serializable {
         return fileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
     public String getFileBase64() {
         return fileBase64;
-    }
-
-    public void setFileBase64(String fileBase64) {
-        this.fileBase64 = fileBase64;
     }
 }

@@ -5,18 +5,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class FileManager extends UnicastRemoteObject implements FileListInterface {
 
-    private ArrayList<FileData> fileList = new ArrayList<FileData>();
+    private static HashMap<UUID, String> fileList = new HashMap<>();
     protected FileManager() throws RemoteException{
 
     }
-    public FileManager(ArrayList<FileData> fileList) throws RemoteException{
-        this.fileList=fileList;
+    public FileManager(HashMap<UUID, String> fileList) throws RemoteException{
+        FileManager.fileList =fileList;
     }
     public void base64ToFile(FileData f) throws IOException {
         byte[] decodedImg = Base64.getDecoder().decode(f.getFileBase64().getBytes(StandardCharsets.UTF_8));
@@ -25,26 +25,18 @@ public class FileManager extends UnicastRemoteObject implements FileListInterfac
     }
     public UUID addFile(FileData f) throws RemoteException {
         UUID id = UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(f.getFileBase64()).getBytes()).toString());
-        //System.out.println(f.getFileName());  //For testing
-        //System.out.println(id);   //For testing
         f.setFileID(id);
-        this.fileList.add(f);
+        fileList.put(f.getFileID(), f.getFileName());
+        System.out.println(fileList);  //For testing
         try {
             base64ToFile(f);
         }catch (Exception e) {
-            System.out.println("base64ToFile: " + e.getMessage());
+            System.out.println("base64ToFile: " + e.getMessage()+"\n");
         }
         return id;
     }
-    public String getFileID(String fileName) throws RemoteException{
-        for(int i = 0; i < this.fileList.size(); ++i) {
-            if (fileName.equals((this.fileList.get(i)).getFileName())) {
-                return this.fileList.get(i).getFileID().toString();
-            }
-        }
-        return null;
-    }
-    public ArrayList<FileData> fileList() throws RemoteException {
+
+    public HashMap<UUID, String> fileList() throws RemoteException {
         return fileList;
     }
 }
