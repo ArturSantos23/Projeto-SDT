@@ -19,7 +19,7 @@ public class Server3 {
             fileList = new FileManager();
             r.rebind("filelist", fileList);
 
-            System.out.println("File server ready");
+            System.out.println("File server ready\n");
         } catch (Exception e) {
             System.out.println("File server main " + e.getMessage());
         }
