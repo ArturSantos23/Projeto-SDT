@@ -2,7 +2,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class Processor {
+public class Storage_Main {
     public static Registry r = null;
 
     public static FileManager fileList;
@@ -17,11 +17,11 @@ public class Processor {
 
         try {
             fileList = new FileManager();
-            r.rebind("filelist", fileList);
+            r.rebind("storage", fileList);
 
-            System.out.println("File server ready\n");
+            System.out.println("Storage server ready\n");
         } catch (Exception e) {
-            System.out.println("File server main " + e.getMessage());
+            System.out.println("Storage server main " + e.getMessage());
         }
     }
 }
