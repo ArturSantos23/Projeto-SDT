@@ -10,7 +10,7 @@ import java.rmi.server.UnicastRemoteObject;
 public class ProcessorManager extends UnicastRemoteObject implements ProcessorInterface {
     RequestClass request;
     FileData f;
-    FileInterface FileInte = (FileInterface) Naming.lookup("rmi://localhost:2021/Storage");
+    FileInterface FileInte = (FileInterface) Naming.lookup("rmi://localhost:2021/storage");
     protected ProcessorManager() throws RemoteException, MalformedURLException, NotBoundException {
     }
 
@@ -39,17 +39,25 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     public void Exec(String url) throws IOException
     {
         request.setEstadoConcluido();
-        try
-        {
-            ProcessBuilder processBuilder = new ProcessBuilder(url);
-            Process processo = processBuilder.start();
-            BufferedReader reader=new BufferedReader(new InputStreamReader(processo.getInputStream()));
+        try {
+            Process runtimeProcess = Runtime.getRuntime().exec(url);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(runtimeProcess.getInputStream()));
+            StringBuilder output = new StringBuilder();
 
+            String line;
+            while((line = reader.readLine()) != null){
+                output.append(line).append(System.getProperty("line.separator"));
+            }
+            runtimeProcess.waitFor();
+            reader.close();
+
+            System.out.println("Script executado!");
+
+            FileInte.FileOutput(request.getIdentificadorFile().toString(), f);
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        FileInte.FileOutput(request.getIdentificadorRequest().toString(),f);
     }
+
 }

@@ -11,9 +11,9 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     }
     public UUID SendRequest(RequestClass r) throws IOException, NotBoundException, InterruptedException {
 
-        ProcessorInterface ProcessorInte = (ProcessorInterface) Naming.lookup("rmi://localhost:2021/Processor");
+        ProcessorInterface ProcessorInte = (ProcessorInterface) Naming.lookup("rmi://localhost:2022/processor");
         ProcessorInte.Send(r);
-        r.setIdentificadorProcessor(UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(2024).getBytes()).toString()));
+        r.setIdentificadorProcessor(UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(2022).getBytes()).toString()));
         return r.getIdentificadorProcessor();
     }
 }

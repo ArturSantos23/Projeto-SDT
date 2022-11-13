@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class Storage_Main {
+public class Storage_Main implements Serializable {
     public static Registry r = null;
 
     public static FileManager fileList;
