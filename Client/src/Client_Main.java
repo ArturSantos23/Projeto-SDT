@@ -6,9 +6,7 @@ import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.Base64;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -90,9 +88,11 @@ public class Client_Main {
         if(path.isFile()==false){
             return;
         }
-        RequestClass r = new RequestClass(UUID.randomUUID(),url, ID,1,null);
-        UUID IDProc = balancerInterface.SendRequest(r);
-        r.setIdentificadorProcessor(IDProc);
+        else {
+            System.out.println("Cheguei aqui");
+            ArrayList<String> r = balancerInterface.SendRequest(ID, url);
+        }
+
     }
 
     public static void Menu() throws IOException, NotBoundException, InterruptedException {

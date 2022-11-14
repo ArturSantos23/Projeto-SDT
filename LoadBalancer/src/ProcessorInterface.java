@@ -1,11 +1,9 @@
 import java.io.IOException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.UUID;
 
 public interface ProcessorInterface extends Remote {
-    void Send (RequestClass r) throws IOException, InterruptedException;
-
     int GetEstado() throws RemoteException;
-
-    void Exec(String url) throws IOException;
+    void Exec(String fileID, String url) throws RemoteException;
 }

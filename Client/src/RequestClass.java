@@ -9,13 +9,12 @@ public class RequestClass implements Serializable {
 
     private int Estado; //1->em espera 0->concluido
 
-    public  RequestClass (UUID IdentificadorRequest, String script, String IdentificadorFile, int Estado, UUID IdentificadorProcessor)
+    public RequestClass (UUID IdentificadorRequest, String script, String IdentificadorFile, int Estado)
     {
         this.IdentificadorRequest=IdentificadorRequest;
         this.Script=script;
         this.IdentificadorFile=IdentificadorFile;
         this.Estado=1;
-        this.IdentificadorProcessor=IdentificadorProcessor;
     }
 
     void setIdentificadorProcessor(UUID Processor)
