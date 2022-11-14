@@ -11,7 +11,7 @@ public class Processor_Main implements Serializable {
 
     public static ProcessorManager processor;
     public static void main(String[] args) throws RemoteException, NotBoundException, MalformedURLException {
-        String serverID = UUID.nameUUIDFromBytes(String.valueOf("2022").getBytes()).toString();
+        String serverID = UUID.nameUUIDFromBytes("2022".getBytes()).toString();
         FileData p=new FileData(serverID,"1","2022");
         try {
             System.setProperty("java.rmi.server.hostname","127.0.0.1");

@@ -69,7 +69,6 @@ public class Client_Main {
         FileData f = fileInterface.GetFile(ID);
         if (f==null){
             System.out.println(f);
-            return;
         }
         else{
             System.out.println("Nome do ficheiro: ("+f.getFileName()+")");
@@ -85,8 +84,7 @@ public class Client_Main {
         String url = input.nextLine();
         url += input.nextLine();
         path = new File(url);
-        if(path.isFile()==false){
-            return;
+        if(!path.isFile()){
         }
         else {
             System.out.println("Cheguei aqui");

@@ -6,5 +6,5 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public interface BalancerInterface extends Remote {
-    public ArrayList<String> SendRequest(String fileID, String url) throws IOException, NotBoundException, InterruptedException;
+    ArrayList<String> SendRequest(String fileID, String url) throws IOException, NotBoundException, InterruptedException;
 }
