@@ -50,9 +50,9 @@ public class Client_Main {
         try {
             File path;
             String ID;
-            path = new File("C:\\Users\\aguia\\Desktop\\100lines.txt");
+            path = new File("C:\\Users\\aguia\\Desktop\\BINO.txt");
             String base64 = FileToBase64(path);
-            FileData f = new FileData(null, "100lines.txt", base64);
+            FileData f = new FileData(null, "BINO.txt", base64);
             ID = fileInterface.addFile(f);
             System.out.println("File ID: " + ID);
         } catch (RemoteException e){
@@ -77,20 +77,11 @@ public class Client_Main {
     }
 
     public static void createRequest() throws IOException, NotBoundException, InterruptedException {
-        File path;
+        String fileID;
         System.out.println("Insira o ID do ficheiro a enviar");
-        String ID = input.next();
-        System.out.println("Insira o URL do script a executar");
-        String url = input.nextLine();
-        url += input.nextLine();
-        path = new File(url);
-        if(!path.isFile()){
-        }
-        else {
-            System.out.println("Cheguei aqui");
-            ArrayList<String> r = balancerInterface.SendRequest(ID, url);
-        }
+        fileID = input.next();
 
+        processorInterface.Exec(fileID);
     }
 
     public static void Menu() throws IOException, NotBoundException, InterruptedException {

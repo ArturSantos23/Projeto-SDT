@@ -11,7 +11,7 @@ import java.util.UUID;
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
     protected BalancerManager() throws RemoteException {
     }
-    public ArrayList<String> SendRequest(String fileID, String url) throws RemoteException {
+    public ArrayList<String> SendRequest(String fileID) throws RemoteException {
         ProcessorInterface processorInterface = null;
         ArrayList<String> output = new ArrayList<>();
         try {
@@ -19,7 +19,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         }catch (NotBoundException | MalformedURLException a) {
             throw new RuntimeException(a);
         }
-        processorInterface.Exec(fileID,url);
+        processorInterface.Exec(fileID);
         return output;
     }
 }

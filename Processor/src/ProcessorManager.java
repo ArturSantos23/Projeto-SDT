@@ -8,6 +8,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     FileData f;
     static FileInterface FileInte;
 
-    HashMap<String, String> output = new HashMap<>();
+    ArrayList<String> output = new ArrayList<>();
 
     static {
         try {
@@ -41,44 +42,36 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         else
             return request.getEstado();
     }
-    /*public static String FileToBase64(File file){
-        try {
-            byte[] fileContent = readAllBytes(file.toPath());
-            return Base64.getEncoder().encodeToString(fileContent);
-        } catch (IOException e) {
-            throw new IllegalStateException("could not read file " + file, e);
+
+    public static String getFile(String id) throws IOException{
+        String ID = id;
+        System.out.println("ID:");
+        FileData f = FileInte.GetFile(ID);
+        if (f==null){
+            System.out.println(f);
+            return null;
         }
+        else{
+            return f.getFileName();
+        }
+
     }
-    public static void saveOutputFile() throws IOException{
-        File f = new File("C:\\Users\\aguia\\Desktop\\savedFiles\\outfile.txt");
-        String base64 = FileToBase64(f);
-        FileData fd = new FileData(null, "outfile.txt", base64);
-        String UUID = FileInte.addFile(fd);
-        System.out.println("Ficheiro guardado!");
-        System.out.println(UUID);
-    }*/
 
-    public void Exec(String fileID, String url) throws RemoteException
+    public void Exec(String fileID) throws RemoteException
     {
-        output.put(fileID, url);
+        output.add(fileID);
         try {
-            Process runtimeProcess = Runtime.getRuntime().exec(url);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(runtimeProcess.getInputStream()));
-            StringBuilder output = new StringBuilder();
-
-            String line;
-            while((line = reader.readLine()) != null){
-                output.append(line).append(System.getProperty("line.separator"));
-            }
-            runtimeProcess.waitFor();
-            reader.close();
+            String filename = getFile(fileID);
+            System.out.println("FILENAME"+filename);
+            String path = "C:\\Users\\aguia\\Desktop\\EI\\3A1S\\SDT\\Projeto-SDT\\Teste.bat ";
+            Process runtimeProcess = Runtime.getRuntime().exec(path + filename);
 
             System.out.println("Script executado!");
             System.out.println("Ficheiro guardado!");
-            System.out.println(fileID);
+            System.out.println(filename);
 
             //saveOutputFile();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

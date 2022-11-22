@@ -5,5 +5,5 @@ import java.util.UUID;
 
 public interface ProcessorInterface extends Remote {
     int GetEstado() throws RemoteException;
-    void Exec(String fileID, String url) throws RemoteException;
+    void Exec(String fileID) throws RemoteException;
 }

@@ -17,7 +17,7 @@ public class FileManager extends UnicastRemoteObject implements FileInterface {
 
     public void base64ToFile(FileData f) throws IOException {
         byte[] decodedImg = Base64.getDecoder().decode(f.getFileBase64().getBytes(StandardCharsets.UTF_8));
-        Path destinationFile = Paths.get("C:\\Users\\aguia\\Desktop\\savedFiles", f.getFileName());
+        Path destinationFile = Paths.get("C:\\Users\\aguia\\Desktop\\EI\\3A1S\\SDT\\Projeto-SDT\\Storage\\src\\savedFiles", f.getFileName());
         Files.write(destinationFile, decodedImg);
     }
 
