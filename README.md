@@ -1,4 +1,4 @@
-# Sprint 3 <!--(Concluído :white_check_mark:)-->
+# Sprint 3 (Concluído :white_check_mark:)
 
 ## Descrição Sprint 3
 
