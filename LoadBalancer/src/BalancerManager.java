@@ -1,5 +1,5 @@
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.*;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
+
     protected BalancerManager() throws RemoteException {
     }
     public ArrayList<String> SendRequest(String fileID) throws IOException {
@@ -22,4 +23,36 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         processorInterface.Exec(fileID);
         return output;
     }
+
+    public void threadCreatorBalancer(String multicastMessage){
+        byte[] buf = new byte[256];
+        Thread t = (new Thread() {
+            public void run() {
+                try{
+                    MulticastSocket socket = new MulticastSocket(4446);
+                    InetAddress group = InetAddress.getByName("230.0.0.0");
+                    socket.joinGroup(group);
+                    while (true) {
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                        socket.receive(packet);
+                        String received = new String(
+                                packet.getData(), 0, packet.getLength());
+                        if ("end".equals(received)) {//O QUE VOU FAZER COM O QUE RECEBER
+                            break;
+                        }
+                    }
+                    socket.leaveGroup(group);
+                    socket.close();
+                }catch (UnknownHostException e) {
+                    throw new RuntimeException(e);
+                }catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
+        t.start();
+
+    }
+
 }

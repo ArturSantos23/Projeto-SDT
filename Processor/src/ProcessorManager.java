@@ -1,19 +1,12 @@
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.UUID;
-
-import static java.nio.file.Files.readAllBytes;
 
 public class ProcessorManager extends UnicastRemoteObject implements ProcessorInterface, Serializable {
     RequestClass request;
@@ -82,6 +75,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             String file = "C:\\Users\\aguia\\Desktop\\EI\\3A1S\\SDT\\Projeto-SDT\\Storage\\src\\savedFiles\\outfile_"+filename;
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
+
             while ((line = br.readLine()) != null) {
                 outputLines.add(line);
             }
@@ -89,6 +83,12 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void Teikirize(){
+        ThreadMXBean anao = ManagementFactory.getThreadMXBean();
+        System.out.println("ANÃO "+anao.getThreadCount());
+        //return anao.getThreadCount();
     }
 
 }

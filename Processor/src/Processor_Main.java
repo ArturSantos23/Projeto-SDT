@@ -8,7 +8,6 @@ import java.util.UUID;
 
 public class Processor_Main implements Serializable {
     public static Registry r = null;
-
     public static ProcessorManager processor;
     public static void main(String[] args) throws RemoteException, NotBoundException, MalformedURLException {
         String serverID = UUID.nameUUIDFromBytes("2022".getBytes()).toString();
@@ -23,7 +22,7 @@ public class Processor_Main implements Serializable {
         try {
             processor = new ProcessorManager();
             r.rebind("processor", processor);
-
+            processor.Teikirize();
             System.out.println("Processor ready\n");
         } catch (Exception e) {
             System.out.println("Processor main " + e.getMessage());
