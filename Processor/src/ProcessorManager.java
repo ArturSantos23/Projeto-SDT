@@ -57,21 +57,36 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     }
 
-    public void Exec(String fileID) throws RemoteException
-    {
+    public String Exec(String fileID) throws IOException {
+        String filename = null;
         output.add(fileID);
         try {
-            String filename = getFile(fileID);
-            System.out.println("FILENAME"+filename);
+            filename = getFile(fileID);
             String path = "C:\\Users\\aguia\\Desktop\\EI\\3A1S\\SDT\\Projeto-SDT\\Teste.bat ";
             Process runtimeProcess = Runtime.getRuntime().exec(path + filename);
 
             System.out.println("Script executado!");
             System.out.println("Ficheiro guardado!");
             System.out.println(filename);
+            return filename;
 
-            //saveOutputFile();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public ArrayList<String> outputFile(String filename) throws IOException{
+        try {
+            ArrayList<String> outputLines = new ArrayList<String>();
+            String file = "C:\\Users\\aguia\\Desktop\\EI\\3A1S\\SDT\\Projeto-SDT\\Storage\\src\\savedFiles\\outfile_"+filename;
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = br.readLine()) != null) {
+                outputLines.add(line);
+            }
+            return outputLines;
+        }catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

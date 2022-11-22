@@ -11,7 +11,7 @@ import java.util.UUID;
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
     protected BalancerManager() throws RemoteException {
     }
-    public ArrayList<String> SendRequest(String fileID) throws RemoteException {
+    public ArrayList<String> SendRequest(String fileID) throws IOException {
         ProcessorInterface processorInterface = null;
         ArrayList<String> output = new ArrayList<>();
         try {

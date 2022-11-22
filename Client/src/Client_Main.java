@@ -7,6 +7,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Integer.parseInt;
 
@@ -81,7 +82,12 @@ public class Client_Main {
         System.out.println("Insira o ID do ficheiro a enviar");
         fileID = input.next();
 
-        processorInterface.Exec(fileID);
+        String filename = processorInterface.Exec(fileID);
+        TimeUnit.SECONDS.sleep(1);
+        ArrayList<String> outputContent = processorInterface.outputFile(filename);
+        for(int i = 0; i < outputContent.size(); i++){
+            System.out.println(outputContent.get(i));
+        }
     }
 
     public static void Menu() throws IOException, NotBoundException, InterruptedException {
