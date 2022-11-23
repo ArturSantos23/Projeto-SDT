@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.Integer.parseInt;
 
 public class Client_Main {
-    static Scanner input = new Scanner(System.in);
-    static FileInterface fileInterface;
-    static BalancerInterface balancerInterface;
-    static ProcessorInterface processorInterface;
+    final static Scanner input = new Scanner(System.in);
+    final static FileInterface fileInterface;
+    final static BalancerInterface balancerInterface;
+    final static ProcessorInterface processorInterface;
     static {
         try {
             fileInterface = (FileInterface) Naming.lookup("rmi://localhost:2021/storage");
@@ -70,7 +70,7 @@ public class Client_Main {
         ID=input.next();
         FileData f = fileInterface.getFile(ID);
         if (f==null){
-            System.out.println(f);
+            System.out.println((Object) null);
         }
         else{
             System.out.println("Nome do ficheiro: ("+f.getFileName()+")");
@@ -95,7 +95,7 @@ public class Client_Main {
 
         System.out.println("1 - Enviar ficherio para Storage");
         System.out.println("2 - Receber um ficheiro dado o seu ID");
-        System.out.println("3 - Enviar um request");
+        System.out.println("3 - Executar script");
         System.out.println("4 - Saber o estado do pedido");
 
         op = parseInt(input.next());

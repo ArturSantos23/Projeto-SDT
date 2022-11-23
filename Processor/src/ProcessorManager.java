@@ -21,9 +21,9 @@ import java.util.HashMap;
 
 public class ProcessorManager extends UnicastRemoteObject implements ProcessorInterface, Serializable {
     RequestClass request;
-    static FileInterface FileInte;
+    final static FileInterface FileInte;
 
-    ArrayList<String> output = new ArrayList<>();
+    final ArrayList<String> output = new ArrayList<>();
 
     static {
         try {
@@ -44,7 +44,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     public static String getFile(String id) throws IOException{
         FileData f;
-        f = FileInte.GetFile(id);
+        f = FileInte.getFile(id);
         if (f==null){
             return null;
         }
@@ -62,7 +62,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             Runtime.getRuntime().exec(path + filename);
 
             System.out.println("Script executado!");
-            System.out.println("Ficheiro guardado!");
             System.out.println(filename);
             return filename;
         } catch (IOException e) {
@@ -101,7 +100,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         t.start();
     }
 
-    public Runnable processorInfo = () -> {
+    final public Runnable processorInfo = () -> {
         final HashMap<String, String> processsorInfo= new HashMap<>();
 
         ThreadMXBean liveThreadCount = ManagementFactory.getThreadMXBean();
