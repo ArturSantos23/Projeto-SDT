@@ -56,7 +56,7 @@ public class Client_Main {
             String base64 = FileToBase64(path);
             FileData f = new FileData(null, "BINO.txt", base64);
             ID = fileInterface.addFile(f);
-            System.out.println("File ID: " + ID);
+            System.out.println("File ID: "+ID);
         } catch (RemoteException e){
             System.out.println(e.getMessage());
         } catch (Exception e){
@@ -68,7 +68,7 @@ public class Client_Main {
         String ID;
         System.out.println("ID:");
         ID=input.next();
-        FileData f = fileInterface.GetFile(ID);
+        FileData f = fileInterface.getFile(ID);
         if (f==null){
             System.out.println(f);
         }

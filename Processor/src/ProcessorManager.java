@@ -8,7 +8,10 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -83,7 +86,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }
     }
     public void threadCreatorProcessor(String multicastMessage) throws RemoteException{
-        byte[] buf = new byte[256];
         Thread t = (new Thread(() -> {
             try{
                 DatagramSocket socket = new DatagramSocket ();
@@ -92,10 +94,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length,group,4446);
                 socket.send(packet);
                 socket.close();
-            } catch (SocketException e) {
-                throw new RuntimeException(e);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
