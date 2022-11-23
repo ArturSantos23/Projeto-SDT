@@ -1,16 +1,19 @@
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.*;
 
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
 
+    static ArrayList<String> activeProcessors = new ArrayList<>();
+
+    static HashMap<String,String> processorsDate = new HashMap<>();
     protected BalancerManager() throws RemoteException {
     }
     public ArrayList<String> SendRequest(String fileID) throws IOException {
@@ -37,7 +40,9 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                     socket.receive(packet);
                     String received = new String(
                             packet.getData(), 0, packet.getLength());
-                    System.out.println(received);
+                    //System.out.println(received);
+                    activeProcessorsAdd(received);
+                    activeProcessorsDel(received);
                     if ("end".equals(received)) {
                         //Proximo Sprint
                         break;
@@ -47,8 +52,50 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                 socket.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
             }
         }));
         t.start();
+    }
+
+    public void activeProcessorsAdd(String received){
+        String receivedToSplit = received.substring(1);
+        String[] arrofreceived = receivedToSplit.split("-",2);
+        String PID = arrofreceived[0];
+        if(activeProcessors.contains(PID)){
+
+        }else{
+            activeProcessors.add(PID);
+        }
+
+        System.out.println("Processadores ativos: ");
+        System.out.println(activeProcessors);
+    }
+
+    public void activeProcessorsDel(String received) throws ParseException {
+        String receivedToSplit = received.substring(1);
+        String[] arrofreceived = receivedToSplit.split("-",2);
+        String PID = arrofreceived[0];
+        String date = String.valueOf(LocalTime.now());
+        processorsDate.put(PID,date);
+        System.out.println(processorsDate);
+
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        if(processorsDate.isEmpty()){
+
+        }else{
+            for(Map.Entry<String,String> set: processorsDate.entrySet()){
+                String process = set.getKey();
+                Date dateOfRequConverted = format.parse(processorsDate.get(process));
+                Date datenowConverted = format.parse(date);
+                long difference = datenowConverted.getTime()-dateOfRequConverted.getTime();
+                if(difference>20000){
+                    activeProcessors.remove(process);
+                    processorsDate.remove(process);
+                    System.out.println("O processador com PID "+process+" já não está ativo");
+                }
+            }
+        }
     }
 }

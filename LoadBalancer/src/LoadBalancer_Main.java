@@ -17,7 +17,6 @@ public class LoadBalancer_Main {
         try {
             fileList = new BalancerManager();
             r.rebind("balancer", fileList);
-
             System.out.println("LoadBalancer ready\n");
 
             fileList.threadCreatorBalancer();
