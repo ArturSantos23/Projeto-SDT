@@ -34,7 +34,7 @@ public class Processor_Main implements Serializable {
             System.out.println("Processor ready\n"+"PID:"+PID);
             System.out.println("Processor info: ");
             ScheduledExecutorService executor = newScheduledThreadPool(5);
-            executor.scheduleAtFixedRate(processor.processorInfo, 0, 3, TimeUnit.SECONDS);
+            executor.scheduleAtFixedRate(processor.processorInfo, 0, 5, TimeUnit.SECONDS);
         } catch (Exception e) {
             System.out.println("Processor main " + e.getMessage());
         }
