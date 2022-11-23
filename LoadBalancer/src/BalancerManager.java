@@ -1,5 +1,8 @@
 import java.io.IOException;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.MulticastSocket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -18,11 +21,11 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         }catch (NotBoundException | MalformedURLException a) {
             throw new RuntimeException(a);
         }
-        processorInterface.Exec(fileID);
+        processorInterface.exec(fileID);
         return output;
     }
 
-    public void threadCreatorBalancer(String multicastMessage){
+    public void threadCreatorBalancer() throws RemoteException{
         byte[] buf = new byte[256];
         Thread t = (new Thread(() -> {
             try{
@@ -34,7 +37,9 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                     socket.receive(packet);
                     String received = new String(
                             packet.getData(), 0, packet.getLength());
-                    if ("end".equals(received)) {//O QUE VOU FAZER COM O QUE RECEBER
+                    System.out.println(received);
+                    if ("end".equals(received)) {
+                        //Proximo Sprint
                         break;
                     }
                 }

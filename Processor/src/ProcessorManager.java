@@ -1,10 +1,12 @@
 import com.sun.management.OperatingSystemMXBean;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
+import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.net.*;
 import java.rmi.Naming;
@@ -30,7 +32,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     protected ProcessorManager() throws RemoteException {
     }
-    public int GetEstado() throws RemoteException {
+    public int getEstado() throws RemoteException {
         if(request==null)
             return 0;
         else
@@ -46,9 +48,9 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         else{
             return f.getFileName();
         }
-
     }
-    public String Exec(String fileID) {
+
+    public String exec(String fileID) {
         String filename;
         output.add(fileID);
         try {
@@ -60,7 +62,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             System.out.println("Ficheiro guardado!");
             System.out.println(filename);
             return filename;
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,24 +82,20 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             throw new RuntimeException(e);
         }
     }
-    public void threadCreatorBalancer(String multicastMessage){
+    public void threadCreatorProcessor(String multicastMessage) throws RemoteException{
         byte[] buf = new byte[256];
         Thread t = (new Thread(() -> {
             try{
-                MulticastSocket socket = new MulticastSocket(4446);
+                DatagramSocket socket = new DatagramSocket ();
                 InetAddress group = InetAddress.getByName("230.0.0.0");
-                socket.joinGroup(group);
-                while (true) {
-                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                    socket.receive(packet);
-                    String received = new String(
-                            packet.getData(), 0, packet.getLength());
-                    if ("end".equals(received)) {//O QUE VOU FAZER COM O QUE RECEBER
-                        break;
-                    }
-                }
-                socket.leaveGroup(group);
+                byte [] buffer = multicastMessage.getBytes();
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length,group,4446);
+                socket.send(packet);
                 socket.close();
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -117,9 +114,19 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         String processCPULoadDouble = String.valueOf(processCPULoad.getProcessCpuLoad());
         String heapMemoryUsageString = String.valueOf(heapMemoryUsage.getUsed());
 
-        String makeCompoundKey = liveThreadCountString+"->" + processCPULoadDouble;
+        RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+        String GVMName = bean.getName();
+        long PID = Long.parseLong(GVMName.split("@")[0]);
+
+        String makeCompoundKey =PID+"-"+liveThreadCountString+"->" + processCPULoadDouble;
         processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
 
-        System.out.println(processsorInfo);
+        //System.out.println(processsorInfo);
+
+        try {
+            threadCreatorProcessor(processsorInfo.toString());
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
     };
 }

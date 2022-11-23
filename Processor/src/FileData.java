@@ -1,5 +1,4 @@
 import java.io.Serializable;
-import java.util.UUID;
 
 public class FileData implements Serializable {
 

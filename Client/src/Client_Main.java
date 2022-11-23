@@ -39,7 +39,7 @@ public class Client_Main {
 
     public static void getEstado() throws RemoteException{
         int state;
-        state = processorInterface.GetEstado();
+        state = processorInterface.getEstado();
         if(state == 0){
             System.out.println("Não enviado!");
         }
@@ -75,7 +75,6 @@ public class Client_Main {
         else{
             System.out.println("Nome do ficheiro: ("+f.getFileName()+")");
         }
-
     }
 
     public static void createRequest() throws IOException, InterruptedException {
@@ -83,7 +82,7 @@ public class Client_Main {
         System.out.println("Insira o ID do ficheiro a enviar");
         fileID = input.next();
 
-        String filename = processorInterface.Exec(fileID);
+        String filename = processorInterface.exec(fileID);
         TimeUnit.SECONDS.sleep(1);
         ArrayList<String> outputContent = processorInterface.outputFile(filename);
         for (String s : outputContent) {

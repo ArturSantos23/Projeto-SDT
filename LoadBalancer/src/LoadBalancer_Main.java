@@ -19,6 +19,8 @@ public class LoadBalancer_Main {
             r.rebind("balancer", fileList);
 
             System.out.println("LoadBalancer ready\n");
+
+            fileList.threadCreatorBalancer();
         } catch (Exception e) {
             System.out.println("LoadBalancer main " + e.getMessage());
         }
