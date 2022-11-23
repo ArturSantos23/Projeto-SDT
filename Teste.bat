@@ -1,6 +1,6 @@
 @echo OFF
 SETLOCAL ENABLEDELAYEDEXPANSION
-SET "destdir=C:\Users\aguia\Desktop\EI\3A1S\SDT\Projeto-SDT\Storage\src\savedFiles"
+SET "destdir=Storage\src\savedFiles"
 SET "filename1=%destdir%\%1"
 SET "outfile=%destdir%\outfile_%1"
 SET /a count=0

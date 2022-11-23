@@ -2,11 +2,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
-import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.Integer.parseInt;
@@ -37,7 +38,7 @@ public class Client_Main {
     }
 
     public static void getEstado() throws RemoteException{
-        int state = 0;
+        int state;
         state = processorInterface.GetEstado();
         if(state == 0){
             System.out.println("Não enviado!");
@@ -47,11 +48,11 @@ public class Client_Main {
         }
     }
 
-    public static void sendFile() throws IOException{
+    public static void sendFile() {
         try {
             File path;
             String ID;
-            path = new File("C:\\Users\\aguia\\Desktop\\BINO.txt");
+            path = new File("C:\\Users\\artur\\Desktop\\Artur\\BINO.txt");
             String base64 = FileToBase64(path);
             FileData f = new FileData(null, "BINO.txt", base64);
             ID = fileInterface.addFile(f);
@@ -64,7 +65,7 @@ public class Client_Main {
     }
 
     public static void getFile() throws IOException{
-        String ID = null;
+        String ID;
         System.out.println("ID:");
         ID=input.next();
         FileData f = fileInterface.GetFile(ID);
@@ -77,7 +78,7 @@ public class Client_Main {
 
     }
 
-    public static void createRequest() throws IOException, NotBoundException, InterruptedException {
+    public static void createRequest() throws IOException, InterruptedException {
         String fileID;
         System.out.println("Insira o ID do ficheiro a enviar");
         fileID = input.next();
@@ -85,12 +86,12 @@ public class Client_Main {
         String filename = processorInterface.Exec(fileID);
         TimeUnit.SECONDS.sleep(1);
         ArrayList<String> outputContent = processorInterface.outputFile(filename);
-        for(int i = 0; i < outputContent.size(); i++){
-            System.out.println(outputContent.get(i));
+        for (String s : outputContent) {
+            System.out.println(s);
         }
     }
 
-    public static void Menu() throws IOException, NotBoundException, InterruptedException {
+    public static void Menu() throws IOException, InterruptedException {
         int op;
 
         System.out.println("1 - Enviar ficherio para Storage");
@@ -104,15 +105,12 @@ public class Client_Main {
                 sendFile();
                 break;
             case 2:
-                //GetFile
                 getFile();
                 break;
             case 3:
-                //CreateRequest
                 createRequest();
                 break;
             case 4:
-                //getEstado
                 getEstado();
                 break;
             default:
@@ -120,37 +118,7 @@ public class Client_Main {
                 Menu();
         }
     }
-    public static void main(String[] args) throws NotBoundException, IOException, InterruptedException {
-        /*FileInterface l;
-        File f = new File("C:\\Users\\artur\\Desktop\\Artur\\Teste.png");
-        String base64 = FileToBase64(f);
-        String UUID = null;
-        //String[] serverName = null;
-
-        try{
-            //String[] serverIdSplited = serverId.split("//",2);
-            //serverName = serverIdSplited[1].split("/",2);
-
-            l = (FileInterface) Naming.lookup("rmi://localhost:2022/processor");
-            FileData fd = new FileData(null, "Teste.png", base64);
-            UUID = l.addFile(fd);
-
-        } catch (ConnectException e) {
-            //System.out.println("O servidor ["+serverName[0]+"] não consegiu dar resposta.");
-            return;
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("Número máximo de respostas atingidas");
-            return;
-        } catch(RemoteException e) {
-            System.out.println(e.getMessage());
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        //System.out.println("Resposta dada com sucesso pelo servidor: "+serverName[0]);
-        System.out.print("Identificador do ficheiro: ");
-        System.out.println(UUID+"\n");*/
+    public static void main(String[] args) throws IOException, InterruptedException {
         Menu();
     }
-
-
 }

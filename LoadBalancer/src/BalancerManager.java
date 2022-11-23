@@ -5,15 +5,13 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
 
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
 
     protected BalancerManager() throws RemoteException {
     }
     public ArrayList<String> SendRequest(String fileID) throws IOException {
-        ProcessorInterface processorInterface = null;
+        ProcessorInterface processorInterface;
         ArrayList<String> output = new ArrayList<>();
         try {
             processorInterface = (ProcessorInterface) Naming.lookup("rmi://localhost:2022/processor");
@@ -26,33 +24,26 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
 
     public void threadCreatorBalancer(String multicastMessage){
         byte[] buf = new byte[256];
-        Thread t = (new Thread() {
-            public void run() {
-                try{
-                    MulticastSocket socket = new MulticastSocket(4446);
-                    InetAddress group = InetAddress.getByName("230.0.0.0");
-                    socket.joinGroup(group);
-                    while (true) {
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                        socket.receive(packet);
-                        String received = new String(
-                                packet.getData(), 0, packet.getLength());
-                        if ("end".equals(received)) {//O QUE VOU FAZER COM O QUE RECEBER
-                            break;
-                        }
+        Thread t = (new Thread(() -> {
+            try{
+                MulticastSocket socket = new MulticastSocket(4446);
+                InetAddress group = InetAddress.getByName("230.0.0.0");
+                socket.joinGroup(group);
+                while (true) {
+                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                    socket.receive(packet);
+                    String received = new String(
+                            packet.getData(), 0, packet.getLength());
+                    if ("end".equals(received)) {//O QUE VOU FAZER COM O QUE RECEBER
+                        break;
                     }
-                    socket.leaveGroup(group);
-                    socket.close();
-                }catch (UnknownHostException e) {
-                    throw new RuntimeException(e);
-                }catch (IOException e) {
-                    throw new RuntimeException(e);
                 }
+                socket.leaveGroup(group);
+                socket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-
-        });
+        }));
         t.start();
-
     }
-
 }
