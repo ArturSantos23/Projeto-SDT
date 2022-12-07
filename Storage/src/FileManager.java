@@ -12,7 +12,8 @@ import java.util.UUID;
 public class FileManager extends UnicastRemoteObject implements FileInterface {
 
     private static final ArrayList<FileData> fileList = new ArrayList<>();
-    protected FileManager() throws RemoteException{
+
+    protected FileManager() throws RemoteException {
     }
 
     public void base64ToFile(FileData f) throws IOException {
@@ -25,11 +26,11 @@ public class FileManager extends UnicastRemoteObject implements FileInterface {
         UUID id = UUID.fromString(UUID.nameUUIDFromBytes(String.valueOf(f.getFileBase64()).getBytes()).toString());
         f.setFileID(id.toString());
         fileList.add(f);
-        System.out.println(f.getFileID()+" name: "+f.getFileName());  //For testing
+        System.out.println(f.getFileID() + " name: " + f.getFileName());  //For testing
         try {
             base64ToFile(f);
-        }catch (Exception e) {
-            System.out.println("base64ToFile Error: " + e.getMessage()+"\n");
+        } catch (Exception e) {
+            System.out.println("base64ToFile Error: " + e.getMessage() + "\n");
         }
         return id.toString();
     }

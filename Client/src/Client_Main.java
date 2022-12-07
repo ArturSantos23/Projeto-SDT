@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.Integer.parseInt;
 
@@ -27,7 +26,7 @@ public class Client_Main {
         }
     }
 
-    public static String FileToBase64(File file){
+    public static String FileToBase64(File file) {
         try {
             byte[] fileContent = Files.readAllBytes(file.toPath());
             //System.out.println("bytes: " + Arrays.toString(fileContent));
@@ -37,13 +36,12 @@ public class Client_Main {
         }
     }
 
-    public static void getEstado() throws RemoteException{
+    public static void getEstado() throws RemoteException {
         int state;
         state = balancerInterface.getProcEstado();
-        if(state == 0){
+        if (state == 0) {
             System.out.println("Não enviado!");
-        }
-        else if(state == 2){
+        } else if (state == 2) {
             System.out.println("Processo concluído!");
         }
     }
@@ -56,24 +54,23 @@ public class Client_Main {
             String base64 = FileToBase64(path);
             FileData f = new FileData(null, "BINO.txt", base64);
             ID = fileInterface.addFile(f);
-            System.out.println("File ID: "+ID);
-        } catch (RemoteException e){
+            System.out.println("File ID: " + ID);
+        } catch (RemoteException e) {
             System.out.println(e.getMessage());
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void getFile() throws IOException{
+    public static void getFile() throws IOException {
         String ID;
         System.out.println("ID:");
-        ID=input.next();
+        ID = input.next();
         FileData f = fileInterface.getFile(ID);
-        if (f==null){
+        if (f == null) {
             System.out.println((Object) null);
-        }
-        else{
-            System.out.println("Nome do ficheiro: ("+f.getFileName()+")");
+        } else {
+            System.out.println("Nome do ficheiro: (" + f.getFileName() + ")");
         }
     }
 
@@ -82,7 +79,7 @@ public class Client_Main {
         System.out.println("Insira o ID do ficheiro a enviar");
         fileID = input.next();
         FileData f = fileInterface.getFile(fileID);
-        ArrayList<String> outputContent = balancerInterface.SendRequest(fileID,f.getFileName());
+        ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, f.getFileName());
 
         for (String s : outputContent) {
             System.out.println(s);
@@ -98,7 +95,7 @@ public class Client_Main {
         System.out.println("4 - Saber o estado do pedido");
 
         op = parseInt(input.next());
-        switch (op){
+        switch (op) {
             case 1:
                 sendFile();
                 break;
@@ -116,6 +113,7 @@ public class Client_Main {
                 Menu();
         }
     }
+
     public static void main(String[] args) throws IOException, InterruptedException {
         Menu();
     }

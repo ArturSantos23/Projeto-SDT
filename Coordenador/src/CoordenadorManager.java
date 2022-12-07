@@ -16,21 +16,21 @@ import java.util.HashMap;
 import java.util.List;
 
 public class CoordenadorManager extends UnicastRemoteObject implements CoordenadorInterface {
-    final static HashMap<String,String> activeProcessors = new HashMap<>();
-    final static HashMap<String,String> activeProcessorsToSend = new HashMap<>();
+    final static HashMap<String, String> activeProcessors = new HashMap<>();
+    final static HashMap<String, String> activeProcessorsToSend = new HashMap<>();
 
-    public static HashMap<String,String> processosInacabados = new HashMap<>();
+    public static HashMap<String, String> processosInacabados = new HashMap<>();
     public BalancerInterface balancerInterface;
 
     protected CoordenadorManager(String balancerHostName, int balancerPort) throws RemoteException, NotBoundException {
-        Registry r = LocateRegistry.getRegistry(balancerHostName,balancerPort);
+        Registry r = LocateRegistry.getRegistry(balancerHostName, balancerPort);
         balancerInterface = (BalancerInterface) r.lookup("balancer");
     }
 
     public void threadCreatorBalancer() throws RemoteException {
         byte[] buf = new byte[256];
         Thread t = (new Thread(() -> {
-            try{
+            try {
                 MulticastSocket socket = new MulticastSocket(4446);
                 InetAddress group = InetAddress.getByName("230.0.0.0");
                 socket.joinGroup(group);
@@ -57,17 +57,17 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
 
     public void activeProcessorsAdd(String received) throws RemoteException {
         String receivedToSplit = received.substring(1);
-        String[] arrofreceived = receivedToSplit.split("-",2);
+        String[] arrofreceived = receivedToSplit.split("-", 2);
         String PID = arrofreceived[0];
 
         String strToCut = arrofreceived[1];
-        String[] strCutted = strToCut.split("-",2);
+        String[] strCutted = strToCut.split("-", 2);
         String numberProcesses = strCutted[0];
 
-        activeProcessorsToSend.put(PID,numberProcesses);
+        activeProcessorsToSend.put(PID, numberProcesses);
 
         String date = String.valueOf(LocalTime.now());
-        activeProcessors.put(PID,date);
+        activeProcessors.put(PID, date);
 
         balancerInterface.addProcessor(activeProcessorsToSend);
 
@@ -79,9 +79,9 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         System.out.println(activeProcessors);
     }
 
-    public void delProcessor() throws RemoteException, RuntimeException,InterruptedException {
+    public void delProcessor() throws RemoteException, RuntimeException, InterruptedException {
         Thread t = (new Thread() {
-            public void run(){
+            public void run() {
                 while (true) {
                     String date = String.valueOf(LocalTime.now());
                     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
@@ -106,7 +106,7 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                                 throw new RuntimeException(e);
                             }
                             long difference = datenowConverted.getTime() - dateOfRequConverted.getTime();
-                            if(difference > 30000){
+                            if (difference > 30000) {
                                 activeProcessors.remove(obj);
                                 System.out.println("O processador a porta " + obj + " já não está ativo");
 

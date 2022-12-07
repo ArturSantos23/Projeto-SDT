@@ -5,5 +5,5 @@ import java.util.HashMap;
 public interface CoordenadorInterface extends Remote {
     void threadCreatorBalancer() throws RemoteException;
 
-    HashMap<String,String> processosInacabados = new HashMap<>();
+    HashMap<String, String> processosInacabados = new HashMap<>();
 }

@@ -9,7 +9,7 @@ public class FileData implements Serializable {
 
     private final String fileBase64;
 
-    public FileData(String fileID, String fileName, String fileBase64){
+    public FileData(String fileID, String fileName, String fileBase64) {
         this.fileID = fileID;
         this.fileName = fileName;
         this.fileBase64 = fileBase64;

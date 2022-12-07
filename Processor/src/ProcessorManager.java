@@ -40,20 +40,20 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     protected ProcessorManager(int port) throws RemoteException {
         this.port = port;
     }
+
     public int getEstado() throws RemoteException {
-        if(request==null)
+        if (request == null)
             return 0;
         else
             return request.getEstado();
     }
 
-    public static String getFile(String id) throws IOException{
+    public static String getFile(String id) throws IOException {
         FileData f;
         f = FileInte.getFile(id);
-        if (f==null){
+        if (f == null) {
             return null;
-        }
-        else{
+        } else {
             return f.getFileName();
         }
     }
@@ -65,23 +65,24 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             filename = getFile(fileID);
             String path = "Teste.bat ";
             //Guardar numa lista à parte FileID associado ao processor
-            coordenadorInterface.processosInacabados.put(String.valueOf(port),fileID);
+            coordenadorInterface.processosInacabados.put(String.valueOf(port), fileID);
             Runtime.getRuntime().exec(path + filename);
 
             System.out.println("Script executado!");
             System.out.println(filename);
             //remove da lista
-            coordenadorInterface.processosInacabados.remove(String.valueOf(port),fileID);
+            coordenadorInterface.processosInacabados.remove(String.valueOf(port), fileID);
             return filename;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
+
     public ArrayList<String> outputFile(String filename) {
         try {
             ArrayList<String> outputLines = new ArrayList<>();
-            String file = "Storage\\src\\savedFiles\\outfile_"+filename;
+            String file = "Storage\\src\\savedFiles\\outfile_" + filename;
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
 
@@ -89,17 +90,18 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 outputLines.add(line);
             }
             return outputLines;
-        }catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    public void threadCreatorProcessor(String multicastMessage) throws RemoteException{
+
+    public void threadCreatorProcessor(String multicastMessage) throws RemoteException {
         Thread t = (new Thread(() -> {
-            try{
-                DatagramSocket socket = new DatagramSocket ();
+            try {
+                DatagramSocket socket = new DatagramSocket();
                 InetAddress group = InetAddress.getByName("230.0.0.0");
-                byte [] buffer = multicastMessage.getBytes();
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length,group,4446);
+                byte[] buffer = multicastMessage.getBytes();
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, group, 4446);
                 socket.send(packet);
                 socket.close();
             } catch (IOException e) {
@@ -110,7 +112,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     final public Runnable processorInfo = () -> {
-        final HashMap<String, String> processsorInfo= new HashMap<>();
+        final HashMap<String, String> processsorInfo = new HashMap<>();
 
         ThreadMXBean liveThreadCount = ManagementFactory.getThreadMXBean();
         OperatingSystemMXBean processCPULoad = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -124,7 +126,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         String GVMName = bean.getName();
         long PID = Long.parseLong(GVMName.split("@")[0]);
 
-        String makeCompoundKey =port+"-"+liveThreadCountString+"->" + processCPULoadDouble;
+        String makeCompoundKey = port + "-" + liveThreadCountString + "->" + processCPULoadDouble;
         processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
 
         System.out.println(processsorInfo);
@@ -135,8 +137,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             throw new RuntimeException(e);
         }
     };
-
-
 
 
 }

@@ -7,7 +7,7 @@ public class LoadBalancer_Main {
     public static Registry r = null;
     public static BalancerManager fileList;
 
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         try {
             r = LocateRegistry.createRegistry(2025);
         } catch (RemoteException a) {

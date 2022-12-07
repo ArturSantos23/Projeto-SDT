@@ -10,7 +10,7 @@ public class Storage_Main implements Serializable {
 
     public static void main(String[] args) {
         try {
-            System.setProperty("java.rmi.server.hostname","127.0.0.1");
+            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
             r = LocateRegistry.createRegistry(2021);
         } catch (RemoteException a) {
             a.printStackTrace();
