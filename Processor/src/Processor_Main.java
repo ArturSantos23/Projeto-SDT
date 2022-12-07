@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 public class Processor_Main implements Serializable {
+    public static int port = 2022;
     public static Registry r = null;
     public static ProcessorManager processor;
     public static void main(String[] args) {
@@ -18,13 +19,13 @@ public class Processor_Main implements Serializable {
         new FileData(serverID, "1", "2022");
         try {
             System.setProperty("java.rmi.server.hostname","127.0.0.1");
-            r = LocateRegistry.createRegistry(2022);
+            r = LocateRegistry.createRegistry(port);
         } catch (RemoteException a) {
             a.printStackTrace();
         }
 
         try {
-            processor = new ProcessorManager();
+            processor = new ProcessorManager(port);
             r.rebind("processor", processor);
 
             RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();

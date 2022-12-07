@@ -3,91 +3,80 @@ import java.net.*;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface{
+    public ProcessorInterface processorInterface;
+    public CoordenadorInterface coordenadorInterface;
+    public static HashMap<String,String> activeProcessors = new HashMap<>();
+    public String bestProcessor;
 
-    final static ArrayList<String> activeProcessors = new ArrayList<>();
-
-    final static HashMap<String,String> processorsDate = new HashMap<>();
     protected BalancerManager() throws RemoteException {
-    }
-    public ArrayList<String> SendRequest(String fileID) throws IOException {
+        }
+    public ArrayList<String> SendRequest(String fileID, String fileName) throws IOException, InterruptedException {
         ProcessorInterface processorInterface;
         ArrayList<String> output = new ArrayList<>();
         try {
-            processorInterface = (ProcessorInterface) Naming.lookup("rmi://localhost:2022/processor");
-        }catch (NotBoundException | MalformedURLException a) {
+            Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
+            processorInterface = (ProcessorInterface) r.lookup("processor");
+        }catch (NotBoundException a) {
             throw new RuntimeException(a);
         }
         processorInterface.exec(fileID);
+        TimeUnit.SECONDS.sleep(1);
+        output = processorInterface.outputFile(fileName);
         return output;
     }
 
-    public void threadCreatorBalancer() throws RemoteException{
-        byte[] buf = new byte[256];
-        Thread t = (new Thread(() -> {
-            try{
-                MulticastSocket socket = new MulticastSocket(4446);
-                InetAddress group = InetAddress.getByName("230.0.0.0");
-                socket.joinGroup(group);
-                while (true) {
-                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                    socket.receive(packet);
-                    String received = new String(
-                            packet.getData(), 0, packet.getLength());
-                    //System.out.println(received);
-                    activeProcessorsAdd(received);
-                    activeProcessorsDel(received);
-                    if ("end".equals(received)) {
-                        //Proximo Sprint
-                        break;
-                    }
-                }
-                socket.leaveGroup(group);
-                socket.close();
-            } catch (IOException | ParseException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-        t.start();
-    }
-
-    public void activeProcessorsAdd(String received){
-        String receivedToSplit = received.substring(1);
-        String[] arrofreceived = receivedToSplit.split("-",2);
-        String PID = arrofreceived[0];
-        if(!activeProcessors.contains(PID)){
-            activeProcessors.add(PID);
+    public int getProcEstado() throws RemoteException{
+        int state;
+        ProcessorInterface processorInterface;
+        try {
+            Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
+            processorInterface = (ProcessorInterface) r.lookup("processor");
+        }catch (NotBoundException a) {
+            throw new RuntimeException(a);
         }
-        System.out.println("Processadores ativos: ");
-        System.out.println(activeProcessors);
+        state = processorInterface.getEstado();
+        return state;
     }
 
-    public void activeProcessorsDel(String received) throws ParseException {
-        String receivedToSplit = received.substring(1);
-        String[] arrofreceived = receivedToSplit.split("-",2);
-        String PID = arrofreceived[0];
-        String date = String.valueOf(LocalTime.now());
-        processorsDate.put(PID,date);
-        System.out.println(processorsDate);
+    public void addProcessor(HashMap<String,String> h) throws RemoteException{
+        activeProcessors.putAll(h);
+        System.out.println(h);
+    }
 
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-        if(!processorsDate.isEmpty())
-            for (Map.Entry<String, String> set : processorsDate.entrySet()) {
-                String process = set.getKey();
-                Date dateOfRequConverted = format.parse(processorsDate.get(process));
-                Date datenowConverted = format.parse(date);
-                long difference = datenowConverted.getTime() - dateOfRequConverted.getTime();
-                if (difference > 20000) {
-                    activeProcessors.remove(process);
-                    processorsDate.remove(process);
-                    System.out.println("O processador com PID " + process + " já não está ativo");
-                }
+    public void saveBestProcessor(String bestProcessor) throws RemoteException{
+        this.bestProcessor = bestProcessor;
+    }
+
+    public ArrayList<String> executeInAnotherProcessor() throws IOException, InterruptedException {
+        HashMap<String,String> lista = coordenadorInterface.processosInacabados;
+        if(!lista.isEmpty()){
+            ProcessorInterface processorInterface;
+            ArrayList<String> output = new ArrayList<>();
+            try {
+                Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
+                processorInterface = (ProcessorInterface) r.lookup("processor");
+            }catch (NotBoundException a) {
+                throw new RuntimeException(a);
             }
+            List keys = new ArrayList(lista.keySet());
+            for (int i = 0; i < keys.size(); i++) {
+                Object obj = keys.get(i);
+                processorInterface.exec(lista.get(obj));
+            }
+
+            TimeUnit.SECONDS.sleep(1);
+            return output;
+        }
+        return null;
     }
 }

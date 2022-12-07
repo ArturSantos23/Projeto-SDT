@@ -13,15 +13,15 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.Integer.parseInt;
 
 public class Client_Main {
+    static RequestClass requestClass;
     final static Scanner input = new Scanner(System.in);
     final static FileInterface fileInterface;
     final static BalancerInterface balancerInterface;
-    final static ProcessorInterface processorInterface;
+
     static {
         try {
             fileInterface = (FileInterface) Naming.lookup("rmi://localhost:2021/storage");
             balancerInterface = (BalancerInterface) Naming.lookup("rmi://localhost:2025/balancer");
-            processorInterface =(ProcessorInterface) Naming.lookup("rmi://localhost:2022/processor");
         } catch (NotBoundException | RemoteException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -39,7 +39,7 @@ public class Client_Main {
 
     public static void getEstado() throws RemoteException{
         int state;
-        state = processorInterface.getEstado();
+        state = balancerInterface.getProcEstado();
         if(state == 0){
             System.out.println("Não enviado!");
         }
@@ -52,7 +52,7 @@ public class Client_Main {
         try {
             File path;
             String ID;
-            path = new File("C:\\Users\\artur\\Desktop\\Artur\\BINO.txt");
+            path = new File("C:\\Users\\aguia\\Desktop\\BINO.txt");
             String base64 = FileToBase64(path);
             FileData f = new FileData(null, "BINO.txt", base64);
             ID = fileInterface.addFile(f);
@@ -81,10 +81,9 @@ public class Client_Main {
         String fileID;
         System.out.println("Insira o ID do ficheiro a enviar");
         fileID = input.next();
+        FileData f = fileInterface.getFile(fileID);
+        ArrayList<String> outputContent = balancerInterface.SendRequest(fileID,f.getFileName());
 
-        String filename = processorInterface.exec(fileID);
-        TimeUnit.SECONDS.sleep(1);
-        ArrayList<String> outputContent = processorInterface.outputFile(filename);
         for (String s : outputContent) {
             System.out.println(s);
         }
