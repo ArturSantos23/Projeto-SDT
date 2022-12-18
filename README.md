@@ -1,6 +1,6 @@
-# Sprint 5 <!--(Concluído :white_check_mark:)-->
+# Sprint 6 <!--(Concluído :white_check_mark:)-->
 
-## Descrição Sprint 5
+## Descrição Sprint 6
 
 O cliente submete um pedido de processamento ao balanceador de carga, que será encaminhado para um dos processadores e
 recebe um identificador para o pedido, juntamente com o identificador do processador responsável pelo processamento.
