@@ -50,9 +50,9 @@ public class Client_Main {
         try {
             File path;
             String ID;
-            path = new File("C:\\Users\\aguia\\Desktop\\BINO.txt");
+            path = new File("C:\\Users\\aguia\\Desktop\\Teste.txt");
             String base64 = FileToBase64(path);
-            FileData f = new FileData(null, "BINO.txt", base64);
+            FileData f = new FileData(null, "Teste.txt", base64);
             ID = fileInterface.addFile(f);
             System.out.println("File ID: " + ID);
         } catch (RemoteException e) {
