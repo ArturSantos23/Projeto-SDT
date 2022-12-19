@@ -58,25 +58,26 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }
     }
 
-    public String exec(String fileID) {
-        String filename;
-        output.add(fileID);
-        try {
-            filename = getFile(fileID);
-            String path = "Teste.bat ";
-            //Guardar numa lista à parte FileID associado ao processor
-            coordenadorInterface.processosInacabados.put(String.valueOf(port), fileID);
-            Runtime.getRuntime().exec(path + filename);
+    public String exec(String fileID, String script) throws IOException {
+        String filename = getFile(fileID);
+        Thread t = (new Thread(() -> {
+            coordenadorInterface.processosInacabados.put(String.valueOf(port), fileID + "+" + script);
+            output.add(fileID);
+            try {
+                //Guardar numa lista à parte FileID associado ao processor
+                String command = script + " " + filename;
+                Runtime.getRuntime().exec(command);
 
-            System.out.println("Script executado!");
-            System.out.println(filename);
-            //remove da lista
-            coordenadorInterface.processosInacabados.remove(String.valueOf(port), fileID);
-            return filename;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+                System.out.println("Script executado!");
+                System.out.println(filename);
+                //remove da lista
+                coordenadorInterface.processosInacabados.remove(String.valueOf(port), fileID + "+" + script);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+        t.start();
+        return filename;
     }
 
     public ArrayList<String> outputFile(String filename) {

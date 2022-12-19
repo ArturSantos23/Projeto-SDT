@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface BalancerInterface extends Remote {
-    ArrayList<String> SendRequest(String fileID, String fileName) throws IOException, InterruptedException;
+    ArrayList<String> SendRequest(String fileID, String fileName, String script) throws IOException, InterruptedException;
 
     void addProcessor(HashMap<String, String> h) throws RemoteException;
 

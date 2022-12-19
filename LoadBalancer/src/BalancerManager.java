@@ -18,7 +18,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     protected BalancerManager() throws RemoteException {
     }
 
-    public ArrayList<String> SendRequest(String fileID, String fileName) throws IOException, InterruptedException {
+    public ArrayList<String> SendRequest(String fileID, String fileName, String script) throws IOException, InterruptedException {
         ProcessorInterface processorInterface;
         ArrayList<String> output = new ArrayList<>();
         try {
@@ -27,8 +27,10 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         } catch (NotBoundException a) {
             throw new RuntimeException(a);
         }
-        processorInterface.exec(fileID);
-        TimeUnit.SECONDS.sleep(1);
+        processorInterface.exec(fileID,script);
+        //wait for the file to be created
+
+        //TimeUnit.SECONDS.sleep(10);
         output = processorInterface.outputFile(fileName);
         return output;
     }
@@ -69,7 +71,11 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             List keys = new ArrayList(lista.keySet());
             for (int i = 0; i < keys.size(); i++) {
                 Object obj = keys.get(i);
-                processorInterface.exec(lista.get(obj));
+                lista.get(obj);
+                String[] parts = lista.get(obj).split("\\+");
+                String fileID = parts[0];
+                String script = parts[1];
+                processorInterface.exec(fileID, script);
             }
 
             TimeUnit.SECONDS.sleep(1);

@@ -76,10 +76,16 @@ public class Client_Main {
 
     public static void createRequest() throws IOException, InterruptedException {
         String fileID;
-        System.out.println("Insira o ID do ficheiro a enviar");
+        System.out.println("Insira o ID do ficheiro a enviar (O ficheiro precisa de estar em Storage)");
         fileID = input.next();
+        System.out.println("Insira o nome do Script que deseja executar");
+        String script = input.next();
+        String scriptQuotationMarks = "\"" + script + "\"";
         FileData f = fileInterface.getFile(fileID);
-        ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, f.getFileName());
+        ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, f.getFileName(), scriptQuotationMarks);
+
+        //wait for the process to finish before printing the output
+
 
         for (String s : outputContent) {
             System.out.println(s);
