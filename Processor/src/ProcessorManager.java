@@ -60,6 +60,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     public void exec(String fileID, String script) throws IOException {
+        threadCount++;
         String filename = getFile(fileID);
         finished.set(false);
         Thread t = (new Thread(() -> {
@@ -79,7 +80,13 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 throw new RuntimeException(e);
             }
         }));
+        threadCount--;
         t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isFinished() throws RemoteException {
@@ -122,6 +129,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         //final HashMap<String, String> processsorInfo = new HashMap<>();
         final HashMap<Integer, Integer> processsorInfo = new HashMap<>();
 
+        /*
         ThreadMXBean liveThreadCount = ManagementFactory.getThreadMXBean();
         OperatingSystemMXBean processCPULoad = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         MemoryUsage heapMemoryUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
@@ -135,8 +143,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         long PID = Long.parseLong(GVMName.split("@")[0]);
 
         String makeCompoundKey = port + "-" + liveThreadCountString + "->" + processCPULoadDouble;
-
-        //processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
+        processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
+        */
         processsorInfo.put(port, threadCount);
         System.out.println(processsorInfo);
 

@@ -53,7 +53,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
 
     public void addProcessor(HashMap<String, String> h) throws RemoteException {
         activeProcessors.putAll(h);
-        System.out.println(h);
+        //System.out.println(h);
     }
 
     public void saveBestProcessor(String bestProcessor) throws RemoteException {
