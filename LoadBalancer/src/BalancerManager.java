@@ -28,7 +28,10 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             throw new RuntimeException(a);
         }
         processorInterface.exec(fileID,script);
-        //wait for the file to be created
+        //wait for exec to finish
+        while (processorInterface.isFinished() == false) {
+            TimeUnit.SECONDS.sleep(1);
+        }
 
         //TimeUnit.SECONDS.sleep(10);
         output = processorInterface.outputFile(fileName);

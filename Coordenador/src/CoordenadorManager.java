@@ -57,18 +57,16 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
 
     public void activeProcessorsAdd(String received) throws RemoteException {
         String receivedToSplit = received.substring(1);
-        String[] arrofreceived = receivedToSplit.split("-", 2);
-        String PID = arrofreceived[0];
+        String[] arrofreceived = receivedToSplit.split("=", 2);
+        String port = arrofreceived[0];
+        String threadsToSplit = arrofreceived[1];
+        String[] arrofthreads = threadsToSplit.split("}", 2);
+        String threads = arrofthreads[0];
 
-        String strToCut = arrofreceived[1];
-        String[] strCutted = strToCut.split("-", 2);
-        String numberProcesses = strCutted[0];
-
-        activeProcessorsToSend.put(PID, numberProcesses);
+        activeProcessorsToSend.put(port, threads);
 
         String date = String.valueOf(LocalTime.now());
-        activeProcessors.put(PID, date);
-
+        activeProcessors.put(port, date);
         balancerInterface.addProcessor(activeProcessorsToSend);
 
         String bestProcessor = bestProcessor();

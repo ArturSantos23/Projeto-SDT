@@ -18,15 +18,16 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProcessorManager extends UnicastRemoteObject implements ProcessorInterface, Serializable {
     RequestClass request;
     int port;
     final static FileInterface FileInte;
-
+    int threadCount;
     final static CoordenadorInterface coordenadorInterface;
-
     final ArrayList<String> output = new ArrayList<>();
+    private AtomicBoolean finished = new AtomicBoolean();
 
     static {
         try {
@@ -58,8 +59,9 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }
     }
 
-    public String exec(String fileID, String script) throws IOException {
+    public void exec(String fileID, String script) throws IOException {
         String filename = getFile(fileID);
+        finished.set(false);
         Thread t = (new Thread(() -> {
             coordenadorInterface.processosInacabados.put(String.valueOf(port), fileID + "+" + script);
             output.add(fileID);
@@ -72,12 +74,16 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 System.out.println(filename);
                 //remove da lista
                 coordenadorInterface.processosInacabados.remove(String.valueOf(port), fileID + "+" + script);
+                finished.set(true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }));
         t.start();
-        return filename;
+    }
+
+    public boolean isFinished() throws RemoteException {
+        return finished.get();
     }
 
     public ArrayList<String> outputFile(String filename) {
@@ -113,7 +119,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     final public Runnable processorInfo = () -> {
-        final HashMap<String, String> processsorInfo = new HashMap<>();
+        //final HashMap<String, String> processsorInfo = new HashMap<>();
+        final HashMap<Integer, Integer> processsorInfo = new HashMap<>();
 
         ThreadMXBean liveThreadCount = ManagementFactory.getThreadMXBean();
         OperatingSystemMXBean processCPULoad = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -128,8 +135,9 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         long PID = Long.parseLong(GVMName.split("@")[0]);
 
         String makeCompoundKey = port + "-" + liveThreadCountString + "->" + processCPULoadDouble;
-        processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
 
+        //processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
+        processsorInfo.put(port, threadCount);
         System.out.println(processsorInfo);
 
         try {
