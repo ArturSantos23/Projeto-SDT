@@ -4,10 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryUsage;
-import java.lang.management.RuntimeMXBean;
-import java.lang.management.ThreadMXBean;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -23,6 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ProcessorManager extends UnicastRemoteObject implements ProcessorInterface, Serializable {
     RequestClass request;
     int port;
+    String link;
     final static FileInterface FileInte;
     int threadCount;
     final static CoordenadorInterface coordenadorInterface;
@@ -38,8 +35,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }
     }
 
-    protected ProcessorManager(int port) throws RemoteException {
-        this.port = port;
+    protected ProcessorManager(String link) throws RemoteException {
+        this.link = link;
     }
 
     public int getEstado() throws RemoteException {
@@ -127,7 +124,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
 
     final public Runnable processorInfo = () -> {
         //final HashMap<String, String> processsorInfo = new HashMap<>();
-        final HashMap<Integer, Integer> processsorInfo = new HashMap<>();
+        final HashMap<String, Integer> processsorInfo = new HashMap<>();
 
         /*
         ThreadMXBean liveThreadCount = ManagementFactory.getThreadMXBean();
@@ -145,7 +142,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         String makeCompoundKey = port + "-" + liveThreadCountString + "->" + processCPULoadDouble;
         processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
         */
-        processsorInfo.put(port, threadCount);
+        processsorInfo.put(link, threadCount);
         System.out.println(processsorInfo);
 
         try {

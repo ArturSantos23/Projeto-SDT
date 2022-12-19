@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -22,8 +24,8 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         ProcessorInterface processorInterface;
         ArrayList<String> output = new ArrayList<>();
         try {
-            Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
-            processorInterface = (ProcessorInterface) r.lookup("processor");
+            //Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
+            processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
         } catch (NotBoundException a) {
             throw new RuntimeException(a);
         }
@@ -42,10 +44,12 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         int state;
         ProcessorInterface processorInterface;
         try {
-            Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
-            processorInterface = (ProcessorInterface) r.lookup("processor");
+            //Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
+            processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
         } catch (NotBoundException a) {
             throw new RuntimeException(a);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
         state = processorInterface.getEstado();
         return state;
@@ -66,8 +70,8 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             ProcessorInterface processorInterface;
             ArrayList<String> output = new ArrayList<>();
             try {
-                Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
-                processorInterface = (ProcessorInterface) r.lookup("processor");
+                //Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
+                processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
             } catch (NotBoundException a) {
                 throw new RuntimeException(a);
             }

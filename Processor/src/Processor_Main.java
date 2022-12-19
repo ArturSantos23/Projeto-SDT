@@ -14,20 +14,26 @@ public class Processor_Main implements Serializable {
     public static int port = 2022;
     public static Registry r = null;
     public static ProcessorManager processor;
+    static String link;
 
     public static void main(String[] args) {
-        String serverID = UUID.nameUUIDFromBytes("2022".getBytes()).toString();
-        new FileData(serverID, "1", "2022");
+        String porta = port + "";
+        String ip = "127.0.0.1";
+        String rebindName = "processor";
+        String serverID = UUID.nameUUIDFromBytes(porta.getBytes()).toString();
+        new FileData(serverID, "1", porta);
         try {
-            System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+            System.setProperty("java.rmi.server.hostname", ip);
             r = LocateRegistry.createRegistry(port);
         } catch (RemoteException a) {
             a.printStackTrace();
         }
 
         try {
-            processor = new ProcessorManager(port);
-            r.rebind("processor", processor);
+            link = "rmi://" + ip + ":" + port + "/" + rebindName;
+            processor = new ProcessorManager(link);
+            r.rebind(rebindName, processor);
+
 
             RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
             String GVMName = bean.getName();
@@ -36,7 +42,7 @@ public class Processor_Main implements Serializable {
             System.out.println("Processor ready\n" + "PID:" + PID);
             //System.out.println("Processor info: ");
             ScheduledExecutorService executor = newScheduledThreadPool(5);
-            executor.scheduleAtFixedRate(processor.processorInfo, 0, 1, TimeUnit.SECONDS);
+            executor.scheduleAtFixedRate(processor.processorInfo, 0, 5, TimeUnit.SECONDS);
         } catch (Exception e) {
             System.out.println("Processor main " + e.getMessage());
         }

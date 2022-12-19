@@ -63,10 +63,14 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         String[] arrofthreads = threadsToSplit.split("}", 2);
         String threads = arrofthreads[0];
 
-        activeProcessorsToSend.put(port, threads);
+        synchronized (activeProcessorsToSend) {
+            activeProcessorsToSend.put(port, threads);
+        }
 
         String date = String.valueOf(LocalTime.now());
-        activeProcessors.put(port, date);
+        synchronized (activeProcessors) {
+            activeProcessors.put(port, date);
+        }
         balancerInterface.addProcessor(activeProcessorsToSend);
 
         String bestProcessor = bestProcessor();
@@ -91,32 +95,34 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                         throw new RuntimeException(e);
                     }
 
-                    if (!activeProcessors.isEmpty()) {
-                        List keys = new ArrayList(activeProcessors.keySet());
-                        for (int i = 0; i < keys.size(); i++) {
-                            Object obj = keys.get(i);
-                            String ultimadataRequest = activeProcessors.get(obj);
+                    synchronized (activeProcessors) {
+                        if (!activeProcessors.isEmpty()) {
+                            List keys = new ArrayList(activeProcessors.keySet());
+                            for (int i = 0; i < keys.size(); i++) {
+                                Object obj = keys.get(i);
+                                String ultimadataRequest = activeProcessors.get(obj);
 
-                            Date dateOfRequConverted = null;
-                            try {
-                                dateOfRequConverted = format.parse(ultimadataRequest);
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
-                            }
-                            long difference = datenowConverted.getTime() - dateOfRequConverted.getTime();
-                            if (difference > 30000) {
-                                activeProcessors.remove(obj);
-                                System.out.println("O processador a porta " + obj + " já não está ativo");
-
+                                Date dateOfRequConverted = null;
                                 try {
-                                    balancerInterface.addProcessor(activeProcessors);
-                                    balancerInterface.executeInAnotherProcessor();
-                                } catch (RemoteException e) {
+                                    dateOfRequConverted = format.parse(ultimadataRequest);
+                                } catch (ParseException e) {
                                     throw new RuntimeException(e);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
+                                }
+                                long difference = datenowConverted.getTime() - dateOfRequConverted.getTime();
+                                if (difference > 30000) {
+                                    activeProcessors.remove(obj);
+                                    System.out.println("O processador a porta " + obj + " já não está ativo");
+
+                                    try {
+                                        balancerInterface.addProcessor(activeProcessors);
+                                        balancerInterface.executeInAnotherProcessor();
+                                    } catch (RemoteException e) {
+                                        throw new RuntimeException(e);
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             }
                         }
