@@ -52,9 +52,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     public void exec(String fileID, String script) throws IOException {
-        coordenadorInterface.processosInacabados.put(String.valueOf(link), fileID + "+" + script);
+        coordenadorInterface.addProcessosInacabados(link,fileID,script);
         threadCount++;
-        System.out.println("Thread count before: " + threadCount);
         String filename = getFile(fileID);
         finished.set(false);
         Thread t = (new Thread(() -> {
@@ -62,17 +61,15 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             try {
                 //Guardar numa lista à parte FileID associado ao processor
                 String command = script + " " + filename;
-                System.out.println(coordenadorInterface.processosInacabados);
+                System.exit(0);
                 Runtime.getRuntime().exec(command);
 
                 System.out.println("Script executado!");
                 System.out.println(filename);
                 //remove da lista
-                coordenadorInterface.processosInacabados.remove(String.valueOf(link), fileID + "+" + script);
+                coordenadorInterface.removeProcessosInacabados(link);
                 finished.set(true);
-                System.out.println(coordenadorInterface.processosInacabados);
                 threadCount--;
-                System.out.println("Thread count: " + threadCount);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

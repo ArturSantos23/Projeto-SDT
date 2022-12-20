@@ -77,8 +77,8 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
 
         balancerInterface.saveBestProcessor(bestProcessor);
 
-        System.out.println("Processadores ativos: ");
-        System.out.println(activeProcessors);
+       // System.out.println("Processadores ativos: ");
+        //System.out.println(activeProcessors);
     }
 
     public void delProcessor() throws RemoteException, RuntimeException, InterruptedException {
@@ -111,11 +111,22 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                                 long difference = datenowConverted.getTime() - dateOfRequConverted.getTime();
                                 if (difference > 30000) {
                                     activeProcessors.remove(obj);
-                                    System.out.println("O processador a porta " + obj + " já não está ativo");
+                                    activeProcessorsToSend.remove(obj);
+                                    String bestProcessor = bestProcessor();
+
+                                    try {
+                                        balancerInterface.saveBestProcessor(bestProcessor);
+                                    } catch (RemoteException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    System.out.println("O processador " + obj + " já não está ativo");
 
                                     try {
                                         balancerInterface.addProcessor(activeProcessors);
+                                        System.out.println("Verificar se Executar em outro processador");
+                                        System.out.println(processosInacabados);
                                         balancerInterface.executeInAnotherProcessor();
+
                                     } catch (RemoteException e) {
                                         throw new RuntimeException(e);
                                     } catch (IOException e) {
@@ -153,5 +164,21 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
             }
         }
         return port;
+    }
+
+    public void addProcessosInacabados(String link, String fileID, String script) throws RemoteException {
+        processosInacabados.put(link, fileID + " + " + script);
+        System.out.println("Processos Inacabados: ");
+        System.out.println(processosInacabados);
+    }
+    public void removeProcessosInacabados(String link) throws RemoteException {
+        processosInacabados.remove(link);
+        System.out.println("Processos Inacabados: ");
+        System.out.println(processosInacabados);
+    }
+    public HashMap<String,String> getProcessosInacabados() throws RemoteException {
+        System.out.println("Processos Inacabados get: ");
+        System.out.println(processosInacabados);
+        return processosInacabados;
     }
 }

@@ -54,7 +54,6 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
 
     public void addProcessor(HashMap<String, String> h) throws RemoteException {
         activeProcessors.putAll(h);
-        //System.out.println(h);
     }
 
     public void saveBestProcessor(String bestProcessor) throws RemoteException {
@@ -62,22 +61,36 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     }
 
     public ArrayList<String> executeInAnotherProcessor() throws IOException, InterruptedException {
-        HashMap<String, String> lista = coordenadorInterface.processosInacabados;
+        try {
+            coordenadorInterface = (CoordenadorInterface) Naming.lookup("rmi://localhost:2050/coordenador");
+        } catch (NotBoundException a) {
+            throw new RuntimeException(a);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Executing in another processor");
+        HashMap<String, String> lista = coordenadorInterface.getProcessosInacabados();
+        System.out.println("Lista de processos inacabados: " + lista);
         if (!lista.isEmpty()) {
+            System.out.println("Lista não está vazia");
             ProcessorInterface processorInterface;
             ArrayList<String> output = new ArrayList<>();
             try {
+                System.out.println("A procurar o melhor processador: " + bestProcessor);
                 processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
             } catch (NotBoundException a) {
                 throw new RuntimeException(a);
             }
             List keys = new ArrayList(lista.keySet());
             for (int i = 0; i < keys.size(); i++) {
+                System.out.println("A executar o processo: " + keys.get(i));
                 Object obj = keys.get(i);
                 lista.get(obj);
                 String[] parts = lista.get(obj).split("\\+");
                 String fileID = parts[0];
+                System.out.println("FileID: " + fileID);
                 String script = parts[1];
+                System.out.println("Script: " + script);
                 processorInterface.exec(fileID, script);
             }
 

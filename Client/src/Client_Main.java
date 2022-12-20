@@ -85,13 +85,17 @@ public class Client_Main {
         String script = input.next();
         String scriptQuotationMarks = "\"" + script + "\"";
         FileData f = fileInterface.getFile(fileID);
-        ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, f.getFileName(), scriptQuotationMarks);
+        try {
+            ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, f.getFileName(), scriptQuotationMarks);
 
-        //wait for the process to finish before printing the output
+            //wait for the process to finish before printing the output
 
 
-        for (String s : outputContent) {
-            System.out.println(s);
+            for (String s : outputContent) {
+                System.out.println(s);
+            }
+        }catch (Exception e){
+            System.out.println("Erro: " + e.getMessage());
         }
     }
 
