@@ -1,13 +1,8 @@
-import com.sun.management.OperatingSystemMXBean;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
+import java.net.*;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -57,33 +52,32 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     public void exec(String fileID, String script) throws IOException {
+        coordenadorInterface.processosInacabados.put(String.valueOf(link), fileID + "+" + script);
         threadCount++;
+        System.out.println("Thread count before: " + threadCount);
         String filename = getFile(fileID);
         finished.set(false);
         Thread t = (new Thread(() -> {
-            coordenadorInterface.processosInacabados.put(String.valueOf(port), fileID + "+" + script);
             output.add(fileID);
             try {
                 //Guardar numa lista à parte FileID associado ao processor
                 String command = script + " " + filename;
+                System.out.println(coordenadorInterface.processosInacabados);
                 Runtime.getRuntime().exec(command);
 
                 System.out.println("Script executado!");
                 System.out.println(filename);
                 //remove da lista
-                coordenadorInterface.processosInacabados.remove(String.valueOf(port), fileID + "+" + script);
+                coordenadorInterface.processosInacabados.remove(String.valueOf(link), fileID + "+" + script);
                 finished.set(true);
+                System.out.println(coordenadorInterface.processosInacabados);
+                threadCount--;
+                System.out.println("Thread count: " + threadCount);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }));
-        threadCount--;
         t.start();
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public boolean isFinished() throws RemoteException {
@@ -106,7 +100,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }
     }
 
-    public void threadCreatorProcessor(String multicastMessage) throws RemoteException {
+    public void sendHeartbeat(String multicastMessage) throws RemoteException {
         Thread t = (new Thread(() -> {
             try {
                 DatagramSocket socket = new DatagramSocket();
@@ -121,6 +115,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }));
         t.start();
     }
+
 
     final public Runnable processorInfo = () -> {
         //final HashMap<String, String> processsorInfo = new HashMap<>();
@@ -143,14 +138,12 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
         */
         processsorInfo.put(link, threadCount);
-        System.out.println(processsorInfo);
+        //System.out.println(processsorInfo);
 
         try {
-            threadCreatorProcessor(processsorInfo.toString());
+            sendHeartbeat(processsorInfo.toString());
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     };
-
-
 }

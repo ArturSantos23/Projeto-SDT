@@ -10,7 +10,7 @@ public interface ProcessorInterface extends Remote {
 
     ArrayList<String> outputFile(String filename) throws IOException;
 
-    void threadCreatorProcessor(String multicastMessage) throws RemoteException;
+    void sendHeartbeat(String multicastMessage) throws RemoteException;
 
     public boolean isFinished() throws RemoteException;
 }

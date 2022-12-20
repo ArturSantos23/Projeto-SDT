@@ -9,12 +9,13 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class BalancerManager extends UnicastRemoteObject implements BalancerInterface {
     public ProcessorInterface processorInterface;
     public CoordenadorInterface coordenadorInterface;
-    public static HashMap<String, String> activeProcessors = new HashMap<>();
+    public static ConcurrentHashMap<String, String> activeProcessors = new ConcurrentHashMap<>();
     public String bestProcessor;
 
     protected BalancerManager() throws RemoteException {
@@ -24,18 +25,15 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         ProcessorInterface processorInterface;
         ArrayList<String> output = new ArrayList<>();
         try {
-            //Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
-            processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
+             processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
         } catch (NotBoundException a) {
             throw new RuntimeException(a);
         }
         processorInterface.exec(fileID,script);
-        //wait for exec to finish
         while (processorInterface.isFinished() == false) {
             TimeUnit.SECONDS.sleep(1);
         }
-
-        //TimeUnit.SECONDS.sleep(10);
+        TimeUnit.SECONDS.sleep(1);
         output = processorInterface.outputFile(fileName);
         return output;
     }
@@ -44,7 +42,6 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         int state;
         ProcessorInterface processorInterface;
         try {
-            //Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
             processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
         } catch (NotBoundException a) {
             throw new RuntimeException(a);
@@ -70,7 +67,6 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             ProcessorInterface processorInterface;
             ArrayList<String> output = new ArrayList<>();
             try {
-                //Registry r = LocateRegistry.getRegistry("localhost", Integer.parseInt(bestProcessor));
                 processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
             } catch (NotBoundException a) {
                 throw new RuntimeException(a);

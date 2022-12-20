@@ -3,7 +3,7 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 
 public interface CoordenadorInterface extends Remote {
-    void threadCreatorBalancer() throws RemoteException;
+    void treatHeartBeat() throws RemoteException;
 
     HashMap<String, String> processosInacabados = new HashMap<>();
 }

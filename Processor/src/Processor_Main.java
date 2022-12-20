@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 public class Processor_Main implements Serializable {
-    public static int port = 2022;
+    public static int port = 2024;
     public static Registry r = null;
     public static ProcessorManager processor;
     static String link;

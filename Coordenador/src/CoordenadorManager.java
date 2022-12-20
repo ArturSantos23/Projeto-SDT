@@ -1,7 +1,5 @@
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -27,7 +25,7 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         balancerInterface = (BalancerInterface) r.lookup("balancer");
     }
 
-    public void threadCreatorBalancer() throws RemoteException {
+    public void treatHeartBeat() throws RemoteException {
         byte[] buf = new byte[256];
         Thread t = (new Thread(() -> {
             try {
@@ -41,6 +39,7 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                             packet.getData(), 0, packet.getLength());
                     //System.out.println(received);
                     activeProcessorsAdd(received);
+
                     if ("end".equals(received)) {
                         //Proximo Sprint
                         break;
@@ -54,6 +53,7 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         }));
         t.start();
     }
+
 
     public void activeProcessorsAdd(String received) throws RemoteException {
         String receivedToSplit = received.substring(1);

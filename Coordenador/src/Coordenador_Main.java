@@ -17,7 +17,7 @@ public class Coordenador_Main {
             coordenadorManager = new CoordenadorManager("localhost", 2025);
             r.rebind("coordenador", coordenadorManager);
             System.out.println("Coordenador ready\n");
-            coordenadorManager.threadCreatorBalancer();
+            coordenadorManager.treatHeartBeat();
             coordenadorManager.delProcessor();
 
             //balancerInterface.add(coiso)
