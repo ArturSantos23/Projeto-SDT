@@ -1,10 +1,12 @@
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -38,6 +40,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             return request.getEstado();
     }
 
+
     public static String getFile(String id) throws IOException {
         FileData f;
         f = FileInte.getFile(id);
@@ -60,8 +63,12 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 Process runtimeProcess  = Runtime.getRuntime().exec(command);
                 System.out.println("Executing script: " + command);
                 runtimeProcess.waitFor();
-
                 System.out.println("Script executed successfully.");
+                File path = new File("Storage\\src\\savedFiles\\outfile_" + filename);
+                String base64 = FileToBase64(path);
+                FileData f = new FileData(null, "outfile_" + filename, base64);
+                String ID = FileInte.addFile(f);
+                System.out.println("File ID: " + ID);
 
                 coordenadorInterface.removeProcessosInacabados(link);
                 finished.set(true);
@@ -71,6 +78,16 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             }
         }));
         t.start();
+    }
+
+    public static String FileToBase64(File file) {
+        try {
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            //System.out.println("bytes: " + Arrays.toString(fileContent));
+            return Base64.getEncoder().encodeToString(fileContent);
+        } catch (IOException e) {
+            throw new IllegalStateException("could not read file " + file, e);
+        }
     }
 
     public boolean isFinished() throws RemoteException {
