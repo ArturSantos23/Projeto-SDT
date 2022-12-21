@@ -38,7 +38,6 @@ public class Processor_Main implements Serializable {
             long PID = Long.parseLong(GVMName.split("@")[0]);
 
             System.out.println("Processor ready\n" + "PID:" + PID);
-            //System.out.println("Processor info: ");
             ScheduledExecutorService executor = newScheduledThreadPool(5);
             executor.scheduleAtFixedRate(processor.processorInfo, 0, 1, TimeUnit.SECONDS);
         } catch (Exception e) {

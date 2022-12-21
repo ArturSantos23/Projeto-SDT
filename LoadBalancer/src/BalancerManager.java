@@ -131,8 +131,6 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         System.out.println("Lista de processos inacabados: " + lista);
         if (!lista.isEmpty()) {
             System.out.println("Lista não está vazia");
-            ProcessorInterface processorInterface;
-            ArrayList<String> output = new ArrayList<>();
 
             List keys = new ArrayList(lista.keySet());
             for (int i = 0; i < keys.size(); i++) {

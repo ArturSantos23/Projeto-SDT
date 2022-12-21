@@ -83,7 +83,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     public static String FileToBase64(File file) {
         try {
             byte[] fileContent = Files.readAllBytes(file.toPath());
-            //System.out.println("bytes: " + Arrays.toString(fileContent));
             return Base64.getEncoder().encodeToString(fileContent);
         } catch (IOException e) {
             throw new IllegalStateException("could not read file " + file, e);
@@ -128,7 +127,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     final public Runnable processorInfo = () -> {
-        //final HashMap<String, String> processsorInfo = new HashMap<>();
         final HashMap<String, Integer> processsorInfo = new HashMap<>();
 
         /*

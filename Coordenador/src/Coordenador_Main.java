@@ -19,8 +19,6 @@ public class Coordenador_Main {
             System.out.println("Coordenador ready\n");
             coordenadorManager.treatHeartBeat();
             coordenadorManager.delProcessor();
-
-            //balancerInterface.add(coiso)
         } catch (Exception e) {
             System.out.println("Coordenador main " + e.getMessage());
         }
