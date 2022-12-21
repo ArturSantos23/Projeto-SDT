@@ -200,18 +200,6 @@ public class RaftNode {
         }
     }
 
-    public void handleRequestVote(int term, int senderId, boolean voteGranted) {
-        if (this.state != State.CANDIDATE || term != this.currentTerm) {
-            return;
-        }
-        if (voteGranted) {
-            this.votedFor = senderId;
-            this.becomeLeader();
-        } else {
-            this.becomeCandidate();
-        }
-    }
-
     /*
     private void sendRequestVote() {
         for (int i = 0; i < this.numNodes; i++) {
