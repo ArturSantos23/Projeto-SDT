@@ -54,7 +54,6 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         t.start();
     }
 
-
     public void activeProcessorsAdd(String received) throws RemoteException {
         String receivedToSplit = received.substring(1);
         String[] arrofreceived = receivedToSplit.split("=", 2);
@@ -77,7 +76,7 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
 
         balancerInterface.saveBestProcessor(bestProcessor);
 
-       // System.out.println("Processadores ativos: ");
+        // System.out.println("Processadores ativos: ");
         //System.out.println(activeProcessors);
     }
 
@@ -168,17 +167,17 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
 
     public void addProcessosInacabados(String link, String fileID, String script) throws RemoteException {
         processosInacabados.put(link, fileID + " + " + script);
-        System.out.println("Processos Inacabados: ");
-        System.out.println(processosInacabados);
+        //System.out.println("Processos Inacabados: ");
+        //System.out.println(processosInacabados);
     }
     public void removeProcessosInacabados(String link) throws RemoteException {
         processosInacabados.remove(link);
-        System.out.println("Processos Inacabados: ");
-        System.out.println(processosInacabados);
+        //System.out.println("Processos Inacabados: ");
+        //System.out.println(processosInacabados);
     }
     public HashMap<String,String> getProcessosInacabados() throws RemoteException {
-        System.out.println("Processos Inacabados get: ");
-        System.out.println(processosInacabados);
+        //System.out.println("Processos Inacabados get: ");
+        //System.out.println(processosInacabados);
         return processosInacabados;
     }
 }

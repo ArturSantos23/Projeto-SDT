@@ -33,17 +33,16 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             throw new RuntimeException(a);
         }
         for (Map.Entry<String, String> entry : activeProcessors.entrySet()) {
-            String key = entry.getKey();
             String value = entry.getValue();
             if(Integer.parseInt(value) > 0){
                waitList.put(fileID, script);
                System.out.println("Added to waitList");
-                executeWaitList();
+               executeWaitList();
             }
             else{
                 System.out.println("Added to processor");
                 processorInterface.exec(fileID,script);
-                while (processorInterface.isFinished() == false) {
+                while (!processorInterface.isFinished()) {
                     TimeUnit.SECONDS.sleep(1);
                 }
                 processingHistory.put(bestProcessor,fileID+"+"+script);
@@ -57,7 +56,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     public void executeWaitList() throws IOException, InterruptedException {
         Thread t = (new Thread(() -> {
             if (waitList.size() > 0) {
-                ArrayList execution = null;
+                ArrayList<String> execution = null;
                 while (true){
                     for (Map.Entry<String, String> entry : waitList.entrySet()) {
                         String key = entry.getKey();

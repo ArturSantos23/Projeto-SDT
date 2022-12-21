@@ -62,15 +62,12 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 System.out.println("Executing script: " + command);
                 runtimeProcess.waitFor();
 
-                System.out.println("Script executado!");
-                System.out.println(filename);
+                System.out.println("Script executed successfully.");
 
                 coordenadorInterface.removeProcessosInacabados(link);
                 finished.set(true);
                 threadCount--;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }));
@@ -113,7 +110,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }));
         t.start();
     }
-
 
     final public Runnable processorInfo = () -> {
         //final HashMap<String, String> processsorInfo = new HashMap<>();

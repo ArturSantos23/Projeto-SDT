@@ -23,7 +23,6 @@ public class RaftNode {
     private final List<Integer> votes;
     private List<LogEntry> log;
     private int commitIndex;
-
     private State state;
     private int leaderId;
     private List<Integer> nextIndex;
@@ -243,13 +242,10 @@ public class RaftNode {
     public void sendAppendEntries(int nodeId, int term, int leaderId, int prevLogIndex, int prevLogTerm, List<LogEntry> entries, int leaderCommit) {
         // Send AppendEntries message to the given node
     }
-    public void sendClientResponse(Object response) {
-        // TODO
-    }
-    private void sendRequest(int recipientId, Object request) {
-        // Send request to the given node
-    }
-    private void sendRequestVote(int peerId, int term, int candidateId, int lastLogIndex, int lastLogTerm) {
+    public void sendRequestVote(int nodeId, int term, int candidateId, int lastLogIndex, int lastLogTerm) {
         // Send RequestVote message to the given node
+    }
+    public void sendRequest(int nodeId, Object command) {
+        // Send Request message to the given node
     }
 }
