@@ -84,13 +84,8 @@ public class Client_Main {
         System.out.println("Insira o nome do Script que deseja executar");
         String script = input.next();
         String scriptQuotationMarks = "\"" + script + "\"";
-        FileData f = fileInterface.getFile(fileID);
         try {
             ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, scriptQuotationMarks);
-
-            //wait for the process to finish before printing the output
-
-
             for (String s : outputContent) {
                 System.out.println(s);
             }

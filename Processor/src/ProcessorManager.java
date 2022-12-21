@@ -15,7 +15,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     final static FileInterface FileInte;
     int threadCount;
     final static CoordenadorInterface coordenadorInterface;
-    final ArrayList<String> output = new ArrayList<>();
+
     private AtomicBoolean finished = new AtomicBoolean();
 
     static {
@@ -54,7 +54,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         String filename = getFile(fileID);
         finished.set(false);
         Thread t = (new Thread(() -> {
-            output.add(fileID);
             try {
                 String command = script + " " + filename;
 

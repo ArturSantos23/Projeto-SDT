@@ -13,5 +13,5 @@ public interface BalancerInterface extends Remote {
 
     int getProcEstado() throws RemoteException;
 
-    ArrayList<String> executeInAnotherProcessor() throws IOException, InterruptedException;
+    public void executeInAnotherProcessor() throws IOException, InterruptedException;
 }

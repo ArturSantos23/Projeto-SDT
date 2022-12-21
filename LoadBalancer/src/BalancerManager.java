@@ -32,22 +32,40 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         } catch (NotBoundException a) {
             throw new RuntimeException(a);
         }
-        for (Map.Entry<String, String> entry : activeProcessors.entrySet()) {
-            String value = entry.getValue();
-            if(Integer.parseInt(value) > 0){
-               waitList.put(fileID, script);
-               System.out.println("Added to waitList");
-               executeWaitList();
-            }
-            else{
-                System.out.println("Added to processor");
-                processorInterface.exec(fileID,script);
-                while (!processorInterface.isFinished()) {
-                    TimeUnit.SECONDS.sleep(1);
-                }
-                processingHistory.put(bestProcessor,fileID+"+"+script);
+        if(activeProcessors.get(bestProcessor).equals("0")){
+            System.out.println("Added to processor");
+            processorInterface.exec(fileID,script);
+            while (!processorInterface.isFinished()) {
                 TimeUnit.SECONDS.sleep(1);
-                output = processorInterface.outputFile(fileID);
+            }
+            processingHistory.put(bestProcessor,fileID+"+"+script);
+            TimeUnit.SECONDS.sleep(1);
+            output = processorInterface.outputFile(fileID);
+        }
+        else{
+            for (Map.Entry<String, String> entry : activeProcessors.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if(Integer.parseInt(value) > 0){
+                   waitList.put(fileID, script);
+                   System.out.println("Added to waitList");
+                   executeWaitList();
+                }
+                else{
+                    try {
+                        processorInterface = (ProcessorInterface) Naming.lookup(key);
+                    } catch (NotBoundException a) {
+                        throw new RuntimeException(a);
+                    }
+                    System.out.println("Added to processor");
+                    processorInterface.exec(fileID,script);
+                    while (!processorInterface.isFinished()) {
+                        TimeUnit.SECONDS.sleep(1);
+                    }
+                    processingHistory.put(bestProcessor,fileID+"+"+script);
+                    TimeUnit.SECONDS.sleep(1);
+                    output = processorInterface.outputFile(fileID);
+                }
             }
         }
         return output;
@@ -100,7 +118,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         this.bestProcessor = bestProcessor;
     }
 
-    public ArrayList<String> executeInAnotherProcessor() throws IOException, InterruptedException {
+    public void executeInAnotherProcessor() throws IOException, InterruptedException {
         try {
             coordenadorInterface = (CoordenadorInterface) Naming.lookup("rmi://localhost:2050/coordenador");
         } catch (NotBoundException a) {
@@ -115,12 +133,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
             System.out.println("Lista não está vazia");
             ProcessorInterface processorInterface;
             ArrayList<String> output = new ArrayList<>();
-            try {
-                System.out.println("A procurar o melhor processador: " + bestProcessor);
-                processorInterface = (ProcessorInterface) Naming.lookup(bestProcessor);
-            } catch (NotBoundException a) {
-                throw new RuntimeException(a);
-            }
+
             List keys = new ArrayList(lista.keySet());
             for (int i = 0; i < keys.size(); i++) {
                 System.out.println("A executar o processo: " + keys.get(i));
@@ -131,13 +144,10 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                 System.out.println("FileID: " + fileID);
                 String script = parts[1];
                 System.out.println("Script: " + script);
-                processorInterface.exec(fileID, script);
+                SendRequest(fileID, script);
                 lista.remove(obj);
+                coordenadorInterface.removeProcessosInacabados(obj.toString());
             }
-
-            TimeUnit.SECONDS.sleep(1);
-            return output;
         }
-        return null;
     }
 }

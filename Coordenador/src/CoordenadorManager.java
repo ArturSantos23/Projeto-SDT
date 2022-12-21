@@ -41,7 +41,6 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                     activeProcessorsAdd(received);
 
                     if ("end".equals(received)) {
-                        //Proximo Sprint
                         break;
                     }
                 }
