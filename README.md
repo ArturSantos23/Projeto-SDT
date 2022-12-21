@@ -9,7 +9,4 @@ Por fim, foi implementado um coordenador, que irá recolher dados sobre os proce
 A comunicação entre as diferentes camadas é essencialmente feita por Remote Method Invocation (RMI) e por Multicast.
 A metodologia adotada foi SCRUM, ou seja, o projeto foi realizado ao longo de vários sprints, que culminaram neste trabalho final.
 
-
-<!--## Como testar:-->
-
-## Arquitetura inicial do sistema em UML: [Sprint 1 UML](https://miro.com/app/board/uXjVPJdU0WE=/?share_link_id=410852075154)
+## Arquitetura do sistema em UML: [Sprint 6 UML](https://raw.githubusercontent.com/ArturSantos23/Projeto-SDT/Sprint-6/UML.svg)
