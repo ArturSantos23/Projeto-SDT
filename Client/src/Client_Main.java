@@ -86,7 +86,7 @@ public class Client_Main {
         String scriptQuotationMarks = "\"" + script + "\"";
         FileData f = fileInterface.getFile(fileID);
         try {
-            ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, f.getFileName(), scriptQuotationMarks);
+            ArrayList<String> outputContent = balancerInterface.SendRequest(fileID, scriptQuotationMarks);
 
             //wait for the process to finish before printing the output
 

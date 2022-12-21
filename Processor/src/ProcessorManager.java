@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.*;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -59,18 +56,21 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         Thread t = (new Thread(() -> {
             output.add(fileID);
             try {
-                //Guardar numa lista à parte FileID associado ao processor
                 String command = script + " " + filename;
-                System.exit(0);
-                Runtime.getRuntime().exec(command);
+
+                Process runtimeProcess  = Runtime.getRuntime().exec(command);
+                System.out.println("Executing script: " + command);
+                runtimeProcess.waitFor();
 
                 System.out.println("Script executado!");
                 System.out.println(filename);
-                //remove da lista
+
                 coordenadorInterface.removeProcessosInacabados(link);
                 finished.set(true);
                 threadCount--;
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }));
@@ -81,8 +81,9 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         return finished.get();
     }
 
-    public ArrayList<String> outputFile(String filename) {
+    public ArrayList<String> outputFile(String fileID) throws IOException {
         try {
+            String filename = getFile(fileID);
             ArrayList<String> outputLines = new ArrayList<>();
             String file = "Storage\\src\\savedFiles\\outfile_" + filename;
             BufferedReader br = new BufferedReader(new FileReader(file));

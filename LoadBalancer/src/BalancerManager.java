@@ -9,6 +9,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -17,11 +18,13 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
     public CoordenadorInterface coordenadorInterface;
     public static ConcurrentHashMap<String, String> activeProcessors = new ConcurrentHashMap<>();
     public String bestProcessor;
+    public static ConcurrentHashMap<String,String> processingHistory = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, String> waitList = new ConcurrentHashMap<>();
 
     protected BalancerManager() throws RemoteException {
     }
 
-    public ArrayList<String> SendRequest(String fileID, String fileName, String script) throws IOException, InterruptedException {
+    public ArrayList<String> SendRequest(String fileID, String script) throws IOException, InterruptedException {
         ProcessorInterface processorInterface;
         ArrayList<String> output = new ArrayList<>();
         try {
@@ -29,13 +32,51 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
         } catch (NotBoundException a) {
             throw new RuntimeException(a);
         }
-        processorInterface.exec(fileID,script);
-        while (processorInterface.isFinished() == false) {
-            TimeUnit.SECONDS.sleep(1);
+        for (Map.Entry<String, String> entry : activeProcessors.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if(Integer.parseInt(value) > 0){
+               waitList.put(fileID, script);
+               System.out.println("Added to waitList");
+                executeWaitList();
+            }
+            else{
+                System.out.println("Added to processor");
+                processorInterface.exec(fileID,script);
+                while (processorInterface.isFinished() == false) {
+                    TimeUnit.SECONDS.sleep(1);
+                }
+                processingHistory.put(bestProcessor,fileID+"+"+script);
+                TimeUnit.SECONDS.sleep(1);
+                output = processorInterface.outputFile(fileID);
+            }
         }
-        TimeUnit.SECONDS.sleep(1);
-        output = processorInterface.outputFile(fileName);
         return output;
+    }
+
+    public void executeWaitList() throws IOException, InterruptedException {
+        Thread t = (new Thread(() -> {
+            if (waitList.size() > 0) {
+                ArrayList execution = null;
+                while (true){
+                    for (Map.Entry<String, String> entry : waitList.entrySet()) {
+                        String key = entry.getKey();
+                        String value = entry.getValue();
+                        try {
+                            execution = SendRequest(key, value);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        if(execution != null){
+                            waitList.remove(key);
+                            System.out.println("Removed from waitList");
+                        }
+                    }
+                }
+            }
+        }));
     }
 
     public int getProcEstado() throws RemoteException {
@@ -92,6 +133,7 @@ public class BalancerManager extends UnicastRemoteObject implements BalancerInte
                 String script = parts[1];
                 System.out.println("Script: " + script);
                 processorInterface.exec(fileID, script);
+                lista.remove(obj);
             }
 
             TimeUnit.SECONDS.sleep(1);

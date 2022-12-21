@@ -8,7 +8,7 @@ public interface ProcessorInterface extends Remote {
 
     public void exec(String fileID, String script) throws IOException;
 
-    ArrayList<String> outputFile(String filename) throws IOException;
+    public ArrayList<String> outputFile(String fileID) throws IOException;
 
     void sendHeartbeat(String multicastMessage) throws RemoteException;
 
