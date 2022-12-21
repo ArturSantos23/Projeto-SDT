@@ -1,4 +1,4 @@
-# Sprint 6 <!--(Concluído :white_check_mark:)-->
+# Sprint 6 (Concluído :white_check_mark:)
 
 ## Descrição Sprint 6
 
