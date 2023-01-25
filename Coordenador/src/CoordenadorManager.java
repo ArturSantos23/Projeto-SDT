@@ -53,10 +53,33 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         t.start();
     }
 
+    public void sendAliveMessage(){
+        Thread t = (new Thread(){
+            public void run(){
+                while (true){
+                    String message = "alive"+activeProcessors.size();
+                    try {
+                        DatagramSocket socket = new DatagramSocket();
+                        InetAddress group = InetAddress.getByName("231.0.0.0");
+                        byte[] buf = message.getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4447);
+                        socket.send(packet);
+                        socket.close();
+                        Thread.sleep(5000);
+                    } catch (IOException | InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        t.start();
+    }
+
     public void activeProcessorsAdd(String received) throws RemoteException {
         String receivedToSplit = received.substring(1);
         String[] arrofreceived = receivedToSplit.split("=", 2);
         String port = arrofreceived[0];
+        //System.out.println("Port: " + port);
         String threadsToSplit = arrofreceived[1];
         String[] arrofthreads = threadsToSplit.split("}", 2);
         String threads = arrofthreads[0];

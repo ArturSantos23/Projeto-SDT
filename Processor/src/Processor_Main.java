@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 public class Processor_Main implements Serializable {
-    public static int port = 2024;
+    public static int port = 2035;
     public static Registry r = null;
     public static ProcessorManager processor;
     static String link;
@@ -36,6 +36,8 @@ public class Processor_Main implements Serializable {
             RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
             String GVMName = bean.getName();
             long PID = Long.parseLong(GVMName.split("@")[0]);
+            //processor.checkAliveCoordenador();
+            //processor.handleCoordenadorFailure();
 
             System.out.println("Processor ready\n" + "PID:" + PID);
             ScheduledExecutorService executor = newScheduledThreadPool(5);
