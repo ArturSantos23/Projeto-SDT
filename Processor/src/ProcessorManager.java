@@ -39,8 +39,8 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     public synchronized void sendCoordenadorFailConsensus() throws IOException {
         Thread t = (new Thread(() -> {
             try {
-                DatagramSocket socket = new DatagramSocket(4450);
-                InetAddress group = InetAddress.getByName("240.0.0.0");
+                DatagramSocket socket = new DatagramSocket(6054);
+                InetAddress group = InetAddress.getByName("232.0.0.0");
                 String message = "fail";
                 byte[] buf = message.getBytes();
                 DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4448);
@@ -56,14 +56,14 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 throw new RuntimeException(e);
             }
         }));
-           t.start();
+        t.start();
     }
 
     public synchronized void receiveCoordenadorConsensus() throws IOException {
         Thread t = (new Thread(() -> {
             try {
-                MulticastSocket socket = new MulticastSocket(4450);
-                InetAddress group = InetAddress.getByName("240.0.0.0");
+                MulticastSocket socket = new MulticastSocket(6054);
+                InetAddress group = InetAddress.getByName("232.0.0.0");
                 socket.joinGroup(group);
                 byte[] buf = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -82,7 +82,6 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         }));
         t.start();
     }
-
     public synchronized void declareConsensus() throws IOException {
         if (consensusProcessors > activeProcessorSize/2) {
             System.out.println("Coordenador Failed By Consensus");
