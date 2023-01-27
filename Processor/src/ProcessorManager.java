@@ -22,6 +22,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     final static FileInterface FileInte;
     int threadCount;
     final static CoordenadorInterface coordenadorInterface;
+    HashMap<String,Integer> processors = new HashMap<>();
 
     private AtomicBoolean finished = new AtomicBoolean();
 
@@ -37,32 +38,43 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     volatile boolean threadStatus = true;
 
     public synchronized void sendCoordenadorFailConsensus() throws IOException {
-        Thread t = (new Thread(() -> {
-            try {
-                DatagramSocket socket = new DatagramSocket(6054);
-                InetAddress group = InetAddress.getByName("232.0.0.0");
-                String message = "fail";
-                byte[] buf = message.getBytes();
-                DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4448);
-                socket.send(packet);
-                socket.close();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            } catch (SocketException e) {
-                throw new RuntimeException(e);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if(activeProcessorSize == 1){
+                try {
+                    processors.put(link,1);
+                    declareConsensus();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
-        }));
-        t.start();
+            else{
+                try {
+                    processors.put(link,1);
+                    DatagramSocket socket = new DatagramSocket();
+                    InetAddress group = InetAddress.getByName("232.0.0.0");
+                    String message = "fail"+link;
+                    System.out.println("Sending fail message to Coordenador");
+                    byte[] buf = message.getBytes();
+                    DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4448);
+                    socket.send(packet);
+                    socket.close();
+
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (SocketException e) {
+                    throw new RuntimeException(e);
+                } catch (UnknownHostException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
     }
 
     public synchronized void receiveCoordenadorConsensus() throws IOException {
         Thread t = (new Thread(() -> {
             try {
-                MulticastSocket socket = new MulticastSocket(6054);
+                MulticastSocket socket = new MulticastSocket(4448);
                 InetAddress group = InetAddress.getByName("232.0.0.0");
                 socket.joinGroup(group);
                 byte[] buf = new byte[256];
@@ -70,9 +82,14 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 socket.receive(packet);
                 String received = new String(
                         packet.getData(), 0, packet.getLength());
-                if (received.equals("fail")) {
-                    consensusProcessors++;
-                    declareConsensus();
+                if(received.contains("fail")){
+                    String linkProcessor = (received.substring(4));
+                    if(!processors.containsKey(linkProcessor)){
+                        processors.put(linkProcessor,2);
+                        System.out.println(received);
+                        System.out.println("Received consensus message from Coordenador");
+                        declareConsensus();
+                    }
                 }
                 socket.leaveGroup(group);
                 socket.close();
@@ -83,40 +100,51 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         t.start();
     }
     public synchronized void declareConsensus() throws IOException {
-        if (consensusProcessors > activeProcessorSize/2) {
-            System.out.println("Coordenador Failed By Consensus");
+        System.out.println("Processor "+processors+" declared consensus");
+        System.out.println("Consensus: " + processors.size());
+        System.out.println("Active Processors: " + activeProcessorSize);
+        if (activeProcessorSize <= 2) {
+            if (processors.size() == 1 && activeProcessorSize == 1) {
+                System.out.println("Coordenador Failed By Consensus");
+            }
+            else if (processors.size() == 2 && activeProcessorSize == 2) {
+                System.out.println("Coordenador Failed By Consensus");
+            }
+        } else {
+            if (processors.size() > (activeProcessorSize / 2)) {
+                System.out.println("Coordenador Failed By Consensus");
+            }
         }
     }
     public synchronized void checkAliveCoordenador() throws IOException, NotBoundException {
-        Thread t = (new Thread() {
-            public void run() {
-                    try {
-                        MulticastSocket socket = new MulticastSocket(4447);
-                        InetAddress group = InetAddress.getByName("231.0.0.0");
-                        socket.joinGroup(group);
-                        String received = null;
-                        while (true) {
-                            byte[] buf = new byte[256];
-                            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                            socket.receive(packet);
-                            received = new String(
-                                    packet.getData(), 0, packet.getLength());
-                            if (received != null) {
-                                activeProcessorSize = Integer.parseInt(received.substring(5));
-                                threadStatus = true;
-                                System.out.println("Received alive message from coordenador");
-                                lastHeartBeat = Instant.now();
-                                break;
-                            }
+        Thread t = (new Thread(() -> {
+                try {
+                    MulticastSocket socket = new MulticastSocket(4447);
+                    InetAddress group = InetAddress.getByName("231.0.0.0");
+                    socket.joinGroup(group);
+                    String received = null;
+                    while (true) {
+                        byte[] buf = new byte[256];
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                        socket.receive(packet);
+                        received = new String(
+                                packet.getData(), 0, packet.getLength());
+                        if (received != null) {
+                            activeProcessorSize = Integer.parseInt(received.substring(5));
+                            threadStatus = true;
+                            System.out.println("Received alive message from coordenador");
+                            lastHeartBeat = Instant.now();
+                            consensusProcessors = 0;
+                            break;
                         }
-                        socket.leaveGroup(group);
-                        socket.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
                     }
-            }
-        });
-        if(threadStatus == true){
+                    socket.leaveGroup(group);
+                    socket.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+        }));
+        if(threadStatus){
             t.start();
         }
         else{
@@ -125,30 +153,37 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     }
 
     public synchronized void handleCoordenadorFailure(){
-        Thread t = (new Thread(){
-            public void run(){
-                while(threadStatus == true){
-                    Instant current, interval;
-                    current = Instant.now();
-                    interval = Instant.ofEpochSecond(ChronoUnit.SECONDS.between(lastHeartBeat , current));
-                    if(interval.getEpochSecond() > 30){
+        Thread t = (new Thread(() -> {
+            if(threadStatus == true){
+                Instant current, interval;
+                current = Instant.now();
+                interval = Instant.ofEpochSecond(ChronoUnit.SECONDS.between(lastHeartBeat , current));
+                if(interval.getEpochSecond() > 30){
+                    threadStatus = false;
+                    if(threadStatus == false){
+                        System.out.println("threadStatus: " + threadStatus);
+                        System.out.println("Coordenador is down");
                         try {
                             sendCoordenadorFailConsensus();
+                            //receiveCoordenadorConsensus();
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-                        System.out.println("Coordenador is down");
-                        threadStatus = false;
-                    }
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        });
-        t.start();
+        }));
+        if(threadStatus){
+            t.start();
+        }
+        else{
+            t.interrupt();
+        }
     }
 
     protected ProcessorManager(String link) throws RemoteException {
@@ -274,7 +309,7 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
             sendHeartbeat(processsorInfo.toString());
             checkAliveCoordenador();
             handleCoordenadorFailure();
-            //receiveCoordenadorConsensus();
+            receiveCoordenadorConsensus();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         } catch (NotBoundException e) {

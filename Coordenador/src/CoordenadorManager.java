@@ -65,8 +65,7 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4447);
                         socket.send(packet);
                         socket.close();
-                        Thread.sleep(5000);
-                    } catch (IOException | InterruptedException e) {
+                    } catch (IOException  e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -202,4 +201,13 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         //System.out.println(processosInacabados);
         return processosInacabados;
     }
+    final public Runnable runnable = () -> {
+        try {
+            sendAliveMessage();
+            treatHeartBeat();
+            delProcessor();
+        } catch (RemoteException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    };
 }
