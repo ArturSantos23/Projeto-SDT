@@ -35,11 +35,16 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                 while (true) {
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     socket.receive(packet);
-                    String received = new String(
+                    String encrypted = new String(
                             packet.getData(), 0, packet.getLength());
-                    //System.out.println(received);
+                    //System.out.println(encrypted);
+                    char[] chars = encrypted.toCharArray();
+                    for(int i = 0; i<chars.length;i++){
+                        chars[i] = (char) (chars[i]-10);
+                    }
+                    String received = new String(chars);
                     activeProcessorsAdd(received);
-
+                    //System.out.println(received);
                     if ("end".equals(received)) {
                         break;
                     }
@@ -59,9 +64,14 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
                 while (true){
                     String message = "alive"+activeProcessors.size();
                     try {
+                        char[] chars = message.toCharArray();
+                        for(int i = 0; i< chars.length; i++){
+                            chars[i] = (char) (chars[i]+10);
+                        }
+                        String encryptedMessage = new String(chars);
                         DatagramSocket socket = new DatagramSocket();
                         InetAddress group = InetAddress.getByName("231.0.0.0");
-                        byte[] buf = message.getBytes();
+                        byte[] buf = encryptedMessage.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4447);
                         socket.send(packet);
                         socket.close();
@@ -201,13 +211,13 @@ public class CoordenadorManager extends UnicastRemoteObject implements Coordenad
         //System.out.println(processosInacabados);
         return processosInacabados;
     }
-    final public Runnable runnable = () -> {
-        try {
-            sendAliveMessage();
-            treatHeartBeat();
-            delProcessor();
-        } catch (RemoteException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    };
+    //final public Runnable runnable = () -> {
+    //    try {
+    //        sendAliveMessage();
+    //        treatHeartBeat();
+    //        delProcessor();
+    //    } catch (RemoteException | InterruptedException e) {
+    //        throw new RuntimeException(e);
+    //    }
+    //};
 }
