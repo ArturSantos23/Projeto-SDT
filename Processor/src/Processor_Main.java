@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 public class Processor_Main implements Serializable {
-    public static int port = 2020;
+    public static int port = 2023;
     public static Registry r = null;
     public static ProcessorManager processor;
     static String link;
@@ -39,9 +39,10 @@ public class Processor_Main implements Serializable {
             //processor.checkAliveCoordenador();
             //processor.handleCoordenadorFailure();
 
-            System.out.println("Processor ready\n" + "PID:" + PID);
+            System.out.println("Processor ready\n" + "PORT:" + port);
             ScheduledExecutorService executor = newScheduledThreadPool(5);
             executor.scheduleAtFixedRate(processor.processorInfo, 0, 1, TimeUnit.SECONDS);
+            executor.scheduleAtFixedRate(processor.runnableReceive, 0, 250, TimeUnit.MILLISECONDS);
             } catch (Exception e) {
             System.out.println("Processor main " + e.getMessage());
         }

@@ -14,7 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProcessorManager extends UnicastRemoteObject implements ProcessorInterface, Serializable {
     RequestClass request;
-    int port;
     String link;
     int activeProcessorSize;
     int consensusProcessors = 0;
@@ -38,26 +37,27 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
     volatile boolean threadStatus = true;
 
     public synchronized void sendCoordenadorFailConsensus() throws IOException {
-            if(activeProcessorSize == 1){
-                try {
-                    processors.put(link,1);
-                    declareConsensus();
+        int port = Integer.parseInt(link.substring(16,20));
+        if(activeProcessorSize == 1){
+            try {
+                processors.put(link,port);
+                declareConsensus();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
             else{
                 try {
-                    processors.put(link,1);
+                    processors.put(link,port);
                     DatagramSocket socket = new DatagramSocket();
                     InetAddress group = InetAddress.getByName("232.0.0.0");
-                    String message = "fail"+link;
+                    String message = "fail "+link;
                     System.out.println("Sending fail message to Coordenador");
                     byte[] buf = message.getBytes();
                     DatagramPacket packet = new DatagramPacket(buf, buf.length, group, 4448);
                     socket.send(packet);
+                    declareConsensus();
                     socket.close();
-
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (SocketException e) {
@@ -83,9 +83,10 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 String received = new String(
                         packet.getData(), 0, packet.getLength());
                 if(received.contains("fail")){
-                    String linkProcessor = (received.substring(4));
+                    String linkProcessor = (received.substring(5));
+                    Integer port = Integer.valueOf((received.substring(21,25)));
                     if(!processors.containsKey(linkProcessor)){
-                        processors.put(linkProcessor,2);
+                        processors.put(linkProcessor,port);
                         System.out.println(received);
                         System.out.println("Received consensus message from Coordenador");
                         declareConsensus();
@@ -302,17 +303,26 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
         String makeCompoundKey = port + "-" + liveThreadCountString + "->" + processCPULoadDouble;
         processsorInfo.put(makeCompoundKey, heapMemoryUsageString);
         */
-        processsorInfo.put(link, threadCount);
         //System.out.println(processsorInfo);
+        processsorInfo.put(link, threadCount);
 
         try {
             sendHeartbeat(processsorInfo.toString());
             checkAliveCoordenador();
             handleCoordenadorFailure();
-            receiveCoordenadorConsensus();
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         } catch (NotBoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    };
+
+    final public Runnable runnableReceive = () -> {
+        try {
+            receiveCoordenadorConsensus();
+        } catch (RemoteException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
