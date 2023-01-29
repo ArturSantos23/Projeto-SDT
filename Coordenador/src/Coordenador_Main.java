@@ -21,8 +21,11 @@ public class Coordenador_Main {
             coordenadorManager = new CoordenadorManager("localhost", 2025);
             r.rebind("coordenador", coordenadorManager);
             System.out.println("Coordenador ready\n");
-            ScheduledExecutorService executor = newScheduledThreadPool(5);
-            executor.scheduleAtFixedRate(coordenadorManager.runnable, 0, 1, TimeUnit.SECONDS);
+            coordenadorManager.sendAliveMessage();
+            coordenadorManager.treatHeartBeat();
+            coordenadorManager.delProcessor();
+            //ScheduledExecutorService executor = newScheduledThreadPool(5);
+            //executor.scheduleAtFixedRate(coordenadorManager.runnable, 0, 1, TimeUnit.SECONDS);
 
         } catch (Exception e) {
             System.out.println("Coordenador main " + e.getMessage());
