@@ -167,11 +167,9 @@ public class ProcessorManager extends UnicastRemoteObject implements ProcessorIn
                 if(interval.getEpochSecond() > 30){
                     threadStatus = false;
                     if(threadStatus == false){
-                        //System.out.println("threadStatus: " + threadStatus);
                         System.out.println("Coordenador is down");
                         try {
                             sendCoordenadorFailConsensus();
-                            //receiveCoordenadorConsensus();
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
